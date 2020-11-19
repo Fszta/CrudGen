@@ -22,5 +22,7 @@ if __name__ == '__main__':
             }
         ]
     }
-    test = SchemaGenerator("test", test_fields)
-    test.run()
+    #test = SchemaGenerator("test", test_fields)
+    #test.run()
+    from crudgen.packages import generator
+    generator.create_api_structure()
