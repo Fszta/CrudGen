@@ -1,4 +1,5 @@
-from crudgen.utils.indentation import Indentator
+from utils.indentation import Indentator
+from utils.config import config, CONFIG_ENV
 
 
 class SchemaGenerator:
@@ -6,7 +7,7 @@ class SchemaGenerator:
         self.name = name
         self.schema_fields = schema_fields
         self.filename = "schema_{}.py".format(name)
-        self.file_open = open(self.filename, "a")
+        self.file_open = open(config[CONFIG_ENV].SCHEMA_PACKAGE_PATH+self.filename, "a")
         
     def run(self):
         """
