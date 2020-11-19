@@ -1,5 +1,6 @@
 from utils.indentation import Indentator
 from utils.config import config, CONFIG_ENV
+from utils.logging import logger
 
 
 class SchemaGenerator:
@@ -14,6 +15,7 @@ class SchemaGenerator:
         Run schema file generation
         Generate schema_name.py file inside schema package
         """
+        logger.info("Start {} schema generation".format(self.name))
         # Add import package
         self.add_imports()
         self.jump_lines(3)
