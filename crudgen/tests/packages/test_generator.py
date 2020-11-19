@@ -1,10 +1,16 @@
 import unittest
 import os
+import shutil
 from crudgen.packages import generator
 
 
 class TestPackageGenerator(unittest.TestCase):
     def test_create_package(self):
+        """
+        Test single package generation
+        Should create a directory & __init__.py file
+        inside
+        """
         test_package = "test"
         generator.create_package(test_package, True)
 
@@ -15,8 +21,15 @@ class TestPackageGenerator(unittest.TestCase):
         # Check test_package contains __init__.py
         files_in_test_package = os.listdir(test_package)
         self.assertTrue("__init__.py" in files_in_test_package)
+        shutil.rmtree("test")
 
     def test_create_api_structure(self):
+        """
+        Test full api structure generation
+        Generated structure should contains all packages
+        defined inside generator.PACKAGES
+        """
         generator.create_api_structure()
         files_in_generated = os.listdir("generated_api")
         [self.assertTrue(package in files_in_generated) for package in generator.PACKAGES]
+        shutil.rmtree("generated_api")
