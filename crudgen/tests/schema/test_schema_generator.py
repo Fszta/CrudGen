@@ -10,6 +10,7 @@ class TestSchemaGenerator(unittest.TestCase):
         files_in_dir = os.listdir()
         schema_generator.file_open.close()
         self.assertTrue("schema_test.py" in files_in_dir)
+        os.remove("schema_test.py")
 
     def test_run(self):
         test_fields = {
@@ -46,4 +47,6 @@ class TestSchemaGenerator(unittest.TestCase):
 
         generated_file.close()
         expected_file.close()
+
+        os.remove(generated_filename)
 
