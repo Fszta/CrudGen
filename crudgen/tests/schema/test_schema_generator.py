@@ -1,5 +1,6 @@
 import unittest
 import os
+import tests.setup
 from crudgen.schema.schema_generator import SchemaGenerator
 
 
