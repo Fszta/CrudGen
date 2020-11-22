@@ -1,11 +1,12 @@
 from unittest import TestCase
-from crudgen.input_parser.table_extract import *
+from crudgen.input_parser.table_extract import parse_json, map_dict_type, extract_tables_name
 from crudgen.input_parser.type_mapper import TypeMapper
+import os
 
 
 class TestTableExtract(TestCase):
     def test_parse_file(self):
-        test_file = "valid_input_test.json"
+        test_file = os.getcwd()+"/test/test_input_parser/valid_input_test.json"
         test_data = parse_json(test_file)
 
         expected_dict = {
@@ -48,7 +49,7 @@ class TestTableExtract(TestCase):
         self.assertEqual(test_data, expected_dict)
 
     def test_extract_tables_name(self):
-        test_file = "valid_input_test.json"
+        test_file = os.getcwd() + "/test/test_input_parser/valid_input_test.json"
         test_data = parse_json(test_file)
         tables_name = extract_tables_name(test_data)
         expected_tables = ["table_1", "table_2"]
@@ -56,7 +57,7 @@ class TestTableExtract(TestCase):
         self.assertEqual(tables_name, expected_tables)
 
     def test_map_dict_type_valid_input(self):
-        test_file = "valid_input_test.json"
+        test_file = os.getcwd() + "/test/test_input_parser/valid_input_test.json"
         test_data = parse_json(test_file)
 
         mapped_data_type = map_dict_type(test_data)
@@ -100,7 +101,7 @@ class TestTableExtract(TestCase):
         self.assertEqual(expected_mapped_data, mapped_data_type)
 
     def test_map_dict_not_valid_input(self):
-        test_file = "not_valid_input_test.json"
+        test_file = os.getcwd() + "/test/test_input_parser/not_valid_input_test.json"
         test_data = parse_json(test_file)
 
         with self.assertRaises(SystemExit):
