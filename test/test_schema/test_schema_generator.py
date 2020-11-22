@@ -1,6 +1,5 @@
 import unittest
 import os
-import tests.setup
 from crudgen.schema.schema_generator import SchemaGenerator
 
 
@@ -36,12 +35,12 @@ class TestSchemaGenerator(unittest.TestCase):
         test_schema_generator = SchemaGenerator("test", test_fields)
         test_schema_generator.run()
 
-        # Read generated schema
+        # Read generated test_schema
         generated_filename = "schema_test.py"
         generated_file = open(generated_filename, "r")
 
-        # Read expected schema
-        expected_file = open("expected_schema.py", "r")
+        # Read expected test_schema
+        expected_file = open(os.getcwd()+"/test/test_schema/expected_schema.py", "r")
 
         self.assertEqual(generated_file.read(), expected_file.read())
 
