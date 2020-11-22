@@ -11,7 +11,7 @@ class TestPackageGenerator(unittest.TestCase):
         Should create a directory & __init__.py file
         inside
         """
-        test_package = "test"
+        test_package = "test_package"
         generator.create_package(test_package, True)
 
         # Check test_package has been created
@@ -21,12 +21,12 @@ class TestPackageGenerator(unittest.TestCase):
         # Check test_package contains __init__.py
         files_in_test_package = os.listdir(test_package)
         self.assertTrue("__init__.py" in files_in_test_package)
-        shutil.rmtree("test")
+        shutil.rmtree("test_package")
 
     def test_create_api_structure(self):
         """
         Test full api structure generation
-        Generated structure should contains all packages
+        Generated structure should contains all test_packages
         defined inside generator.PACKAGES
         """
         generator.create_api_structure()
