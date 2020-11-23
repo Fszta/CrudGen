@@ -1,6 +1,6 @@
 import json
-from utils.logging import logger
-from input_parser.type_mapper import TYPE_MAPPING
+from crudgen.utils.logging import logger
+from crudgen.input_parser.type_mapper import TYPE_MAPPING
 
 
 def extract_tables_name(input_dict: dict):
@@ -37,7 +37,6 @@ def map_dict_type(tables_dict: dict):
         for field in tables_dict[table]:
             try:
                 field["field_type"] = TYPE_MAPPING[field["field_type"]]
-                logger.info(field)
             except KeyError:
                 logger.error("Invalid type {} in table {}, field_type should be one of {}"
                              .format(field["field_type"], table, authorized_input_type))

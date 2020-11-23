@@ -8,7 +8,7 @@ if CONFIG_ENV is None:
 
 class Config:
     GENERATED_API_PATH = "generated_api"
-    SCHEMA_PACKAGE_PATH = GENERATED_API_PATH + "/schema/"
+    SCHEMA_PACKAGE_PATH = GENERATED_API_PATH + "/test_schema/"
 
 
 class DevConfig(Config):

@@ -1,13 +1,13 @@
 import os
 
-PACKAGES = ["controller", "model", "schema", "router"]
+PACKAGES = ["controller", "test_model", "test_schema", "router"]
 BASE = "generated_api"
 
 
 def create_api_structure():
     """
     Create api package structure
-    Generate all defined packages inside Base
+    Generate all defined test_packages inside Base
     """
     create_package(BASE, True)
     [create_package(package, False) for package in PACKAGES]

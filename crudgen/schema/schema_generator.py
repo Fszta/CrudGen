@@ -1,6 +1,6 @@
-from utils.indentation import Indentator
-from utils.config import config, CONFIG_ENV
-from utils.logging import logger
+from crudgen.utils.indentation import Indentator
+from crudgen.utils.config import config, CONFIG_ENV
+from crudgen.utils.logging import logger
 
 
 class SchemaGenerator:
@@ -12,27 +12,27 @@ class SchemaGenerator:
         
     def run(self):
         """
-        Run schema file generation
-        Generate schema_name.py file inside schema package
+        Run test_schema file generation
+        Generate schema_name.py file inside test_schema package
         """
-        logger.info("Start {} schema generation".format(self.name))
+        logger.info("Start {} test_schema generation".format(self.name))
         # Add import package
         self.add_imports()
         self.jump_lines(3)
 
         # Write class name
-        class_name = "test".capitalize()
+        class_name = self.name.capitalize()
         class_declaration = "class " + class_name + "(BaseModel):"
         self.file_open.write(class_declaration)
         self.jump_lines(1)
 
-        # Write all fields defined in schema dict
+        # Write all fields defined in test_schema dict
         self.add_fields()
         self.file_open.close()
 
     def add_fields(self):
         """
-        Add fields to schema class
+        Add fields to test_schema class
         """
         for field in self.schema_fields["schema_field"]:
             self.file_open.write(Indentator.IND_LEVEL_1)

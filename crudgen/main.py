@@ -1,7 +1,8 @@
-from crudgen.schema.schema_generator import SchemaGenerator
+from schema.schema_generator import SchemaGenerator
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+
     test_fields = {
         "schema_field": [
             {
@@ -22,7 +23,7 @@ if __name__ == '__main__':
             }
         ]
     }
-    #test = SchemaGenerator("test", test_fields)
-    #test.run()
-    from crudgen.packages import generator
+    from packages import generator
     generator.create_api_structure()
+    test = SchemaGenerator("tests", test_fields)
+    test.run()
