@@ -7,9 +7,10 @@ if CONFIG_ENV is None:
 
 
 class Config:
+    VERSION = "v0.1-alpha"
     GENERATED_API_PATH = "generated_api"
     SCHEMA_PACKAGE_PATH = GENERATED_API_PATH + "/schema/"
-    VERSION = "v0.1-alpha"
+    MODEL_PACKAGE_PATH = GENERATED_API_PATH + "/model/"
 
 
 class DevConfig(Config):
@@ -20,6 +21,8 @@ class TestConfig(Config):
     CONFIG_ENV = "test"
     GENERATED_API_PATH = "generated_api"
     SCHEMA_PACKAGE_PATH = "test/test_schema/"
+    MODEL_PACKAGE_PATH = "test/test_model/"
+    DATA_TEST_PATH = "test/resources/"
 
 
 config = dict(
