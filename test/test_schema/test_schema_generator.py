@@ -14,7 +14,7 @@ class TestSchemaGenerator(unittest.TestCase):
         schema_name.py should be created in schema
         package
         """
-        schema_generator = SchemaGenerator("test", "test", {})
+        schema_generator = SchemaGenerator("test", {})
         files_in_dir = os.listdir(config["test"].SCHEMA_PACKAGE_PATH)
         schema_generator.file_open.close()
 
@@ -52,7 +52,7 @@ class TestSchemaGenerator(unittest.TestCase):
             },
         ]
 
-        test_schema_generator = SchemaGenerator("test", "test", test_fields)
+        test_schema_generator = SchemaGenerator("test", test_fields)
         test_schema_generator.run()
 
         # Read generated test_schema
