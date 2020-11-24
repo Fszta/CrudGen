@@ -1,6 +1,6 @@
 import os
 
-PACKAGES = ["controller", "test_model", "test_schema", "router"]
+PACKAGES = ["controller", "model", "schema", "router"]
 BASE = "generated_api"
 
 
