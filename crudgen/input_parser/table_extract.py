@@ -43,3 +43,18 @@ def map_dict_type(tables_dict: dict):
                 exit(1)
 
     return tables_dict
+
+
+def extract_table_structure(json_path: str):
+    """
+    Extract table structure
+    :param json_path: path of the json describing tables
+    :return: dict mapping table type
+    """
+    table_description = parse_json(json_path)
+    tables = extract_tables_name(table_description)
+    number_of_tables = len(tables)
+    logger.info("Find {} tables in file {} : {}".format(number_of_tables, json_path, tables))
+    table_mapped_type = map_dict_type(table_description)
+
+    return table_mapped_type
