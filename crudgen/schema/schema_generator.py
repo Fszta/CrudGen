@@ -26,7 +26,7 @@ class SchemaGenerator:
         self.jump_lines(3)
 
         # Write class name
-        class_name = self.name.capitalize()
+        class_name = self.table_name.capitalize()
         class_declaration = "class " + class_name + "(BaseModel):"
         self.file_open.write(class_declaration)
         self.jump_lines(1)
