@@ -4,10 +4,15 @@ from crudgen.utils.logging import logger
 
 
 class SchemaGenerator:
-    def __init__(self, name: str, schema_fields: dict):
-        self.name = name
-        self.schema_fields = schema_fields
-        self.filename = "schema_{}.py".format(name)
+    """
+    Pydantic schema generator
+    Generate a schema.py file for the table pass
+    as argument
+    """
+    def __init__(self, table_name, table_description: dict):
+        self.table_name = table_name
+        self.table_description = table_description
+        self.filename = "schema_{}.py".format(table_name)
         self.file_open = open(config[CONFIG_ENV].SCHEMA_PACKAGE_PATH+self.filename, "a")
         
     def run(self):
@@ -15,7 +20,7 @@ class SchemaGenerator:
         Run test_schema file generation
         Generate schema_name.py file inside test_schema package
         """
-        logger.info("Start {} test_schema generation".format(self.name))
+        logger.info("Start {} test_schema generation".format(self.table_name))
         # Add import package
         self.add_imports()
         self.jump_lines(3)
@@ -34,9 +39,10 @@ class SchemaGenerator:
         """
         Add fields to test_schema class
         """
-        for field in self.schema_fields["schema_field"]:
+        for field in self.table_description:
             self.file_open.write(Indentator.IND_LEVEL_1)
-            self.file_open.write(field["field_name"] + ": " + field["field_type"])
+            pydantic_type = field["field_type"].pydantic_type_name
+            self.file_open.write(field["field_name"] + ": " + pydantic_type)
             self.jump_lines(1)
 
     def add_imports(self):
