@@ -2,7 +2,6 @@ from pydantic import BaseModel
 
 
 class Test(BaseModel):
+    id: int
     name: str
     age: int
-    img_url: str
-    description: str
