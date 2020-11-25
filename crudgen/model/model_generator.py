@@ -61,6 +61,13 @@ class ModelGenerator:
 
     @staticmethod
     def build_attribute(table_field):
+        """
+        Build model attributes, generates :
+        - field name
+        - if field is primary key
+        - sql alchemy type
+        :param table_field: table field description
+        """
         if table_field["primary_key"] is True:
             return "{} = Column({}, primary_key=True, index=True)"\
                 .format(table_field["field_name"], table_field["field_type"].sql_alchemy_type_name)
@@ -78,16 +85,26 @@ class ModelGenerator:
             self.file_open.write("\n")
 
     def run(self):
+        """
+        Run model generation base on input field which
+        corresponds to a table description.
+        The output is a model_name.py file inside
+        model package
+        """
+
+        # Extract unique sql alchemy types
         sql_alchemy_types = self.get_types()
+
+        # Write import statement
         self.file_open.write(self.build_sql_alchemy_import(sql_alchemy_types))
         self.jump_lines(3)
 
+        # Write class declaration
         self.file_open.write(self.declare_class())
         self.jump_lines(1)
 
+        # Write class content
         for field in self.fields:
             self.file_open.write(Indentator.IND_LEVEL_1 + self.build_attribute(field))
             self.jump_lines(1)
 
-    def generate_imports(self):
-        pass
