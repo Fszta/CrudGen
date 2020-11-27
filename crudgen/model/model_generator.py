@@ -4,8 +4,8 @@ from crudgen.utils.indentation import Indentator
 
 class ModelGenerator:
     """
-    SQL Alchemy test_model generator
-    name will be used to create test_model file as :
+    SQL Alchemy test_model generator.
+    Name will be used to create test_model file as :
     model_name.py & also to name the corresponding
     table in database
     """
@@ -22,12 +22,13 @@ class ModelGenerator:
         :return: set of sql alchemy type
         """
         types = [field["field_type"].sql_alchemy_type_name for field in self.fields]
-        unique_types = set(types)
+        unique_types = list(set(types))
+        unique_types.sort()
 
         return unique_types
 
     @staticmethod
-    def build_sql_alchemy_import(types: set):
+    def build_sql_alchemy_import(types: list):
         """
         Build sql alchemy types import statement
         :param types: set of sql alchemy types
@@ -38,6 +39,12 @@ class ModelGenerator:
             import_statement += ", " + sql_alchemy_type
 
         return import_statement
+
+    @staticmethod
+    def write_import_statements(sql_alchemy_import: str):
+        """ Write model class imports """
+        imports = sql_alchemy_import + "\n" + "from database.db_init import Base"
+        return imports
 
     def declare_class(self):
         """
@@ -57,7 +64,7 @@ class ModelGenerator:
         """
         set_table = '__tablename__ = "{}"'.format(self.name)
 
-        return set_table
+        return Indentator.IND_LEVEL_1 + set_table
 
     @staticmethod
     def build_attribute(table_field):
@@ -66,6 +73,7 @@ class ModelGenerator:
         - field name
         - if field is primary key
         - sql alchemy type
+        - if field is unique
         :param table_field: table field description
         """
         if table_field["primary_key"] is True:
@@ -96,11 +104,15 @@ class ModelGenerator:
         sql_alchemy_types = self.get_types()
 
         # Write import statement
-        self.file_open.write(self.build_sql_alchemy_import(sql_alchemy_types))
+        self.file_open.write(self.write_import_statements(self.build_sql_alchemy_import(sql_alchemy_types)))
         self.jump_lines(3)
 
         # Write class declaration
         self.file_open.write(self.declare_class())
+        self.jump_lines(1)
+
+        # Set table name
+        self.file_open.write(self.set_table_name())
         self.jump_lines(1)
 
         # Write class content
@@ -108,3 +120,5 @@ class ModelGenerator:
             self.file_open.write(Indentator.IND_LEVEL_1 + self.build_attribute(field))
             self.jump_lines(1)
 
+        # Close generated file
+        self.file_open.close()

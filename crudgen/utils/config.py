@@ -11,6 +11,7 @@ class Config:
     GENERATED_API_PATH = "generated_api"
     SCHEMA_PACKAGE_PATH = GENERATED_API_PATH + "/schema/"
     MODEL_PACKAGE_PATH = GENERATED_API_PATH + "/model/"
+    DATABASE_PACKAGE_PATH = GENERATED_API_PATH + "/database/"
 
 
 class DevConfig(Config):
@@ -22,6 +23,7 @@ class TestConfig(Config):
     GENERATED_API_PATH = "generated_api"
     SCHEMA_PACKAGE_PATH = "test/test_schema/"
     MODEL_PACKAGE_PATH = "test/test_model/"
+    DATABASE_PACKAGE_PATH = "test/test_database/"
     DATA_TEST_PATH = "test/resources/"
 
 
