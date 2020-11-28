@@ -12,6 +12,7 @@ class Config:
     SCHEMA_PACKAGE_PATH = GENERATED_API_PATH + "/schema/"
     MODEL_PACKAGE_PATH = GENERATED_API_PATH + "/model/"
     DATABASE_PACKAGE_PATH = GENERATED_API_PATH + "/database/"
+    ROUTER_PACKAGE_PATH = GENERATED_API_PATH + "/router/"
 
 
 class DevConfig(Config):
@@ -24,6 +25,7 @@ class TestConfig(Config):
     SCHEMA_PACKAGE_PATH = "test/test_schema/"
     MODEL_PACKAGE_PATH = "test/test_model/"
     DATABASE_PACKAGE_PATH = "test/test_database/"
+    ROUTER_PACKAGE_PATH = "test/test_router/"
     DATA_TEST_PATH = "test/resources/"
 
 
