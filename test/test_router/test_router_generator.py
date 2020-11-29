@@ -3,6 +3,7 @@ import test.setup
 from unittest import TestCase
 from crudgen.utils.config import config
 from test.test_router.router_generator_test import router_generator
+from test.utils.files import check_files_are_identical
 
 
 class TestRouterGenerator(TestCase):
@@ -129,4 +130,13 @@ class TestRouterGenerator(TestCase):
         self.assertEqual(expected, generated)
 
     def test_run(self):
+        """Test complete router file generation"""
         router_generator.run()
+
+        # Files path to compare
+        generated_router_path = config["test"].ROUTER_PACKAGE_PATH + "router_generated.py"
+        expected_file_path = config["test"].ROUTER_PACKAGE_PATH + "expected_router.py"
+
+        # Check files content
+        is_identical = check_files_are_identical(generated_router_path, expected_file_path)
+        self.assertTrue(is_identical)
