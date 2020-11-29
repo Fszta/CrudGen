@@ -202,3 +202,4 @@ class RouterGenerator:
         router_file_content = all_imports + self.router_declaration() + create_method +\
                               get_one_method + get_all_method + update_method + delete_method
         self.file_open.write(router_file_content)
+        self.file_open.close()
