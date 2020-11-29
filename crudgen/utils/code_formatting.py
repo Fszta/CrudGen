@@ -5,8 +5,11 @@ def class_declaration(declaration):
 
 
 def function_declaration(declaration):
-    def inner():
-        return declaration() + "\n"
+    def inner(*args):
+        if len(args) > 0:
+            return "\n\n" + declaration(*args) + "\n"
+        else:
+            return "\n\n" + declaration() + "\n"
     return inner
 
 
