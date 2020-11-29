@@ -9,9 +9,9 @@ class SchemaGenerator:
     Generate a schema.py file for the table pass
     as argument
     """
-    def __init__(self, table_name, table_description: dict):
+    def __init__(self, table_name, table_fields: dict):
         self.table_name = table_name
-        self.table_description = table_description
+        self.table_fields = table_fields
         self.filename = "schema_{}.py".format(table_name)
         self.file_open = open(config[CONFIG_ENV].SCHEMA_PACKAGE_PATH+self.filename, "a")
         
@@ -39,7 +39,7 @@ class SchemaGenerator:
         """
         Add fields to test_schema class
         """
-        for field in self.table_description:
+        for field in self.table_fields:
             self.file_open.write(Indentator.IND_LEVEL_1)
             pydantic_type = field["field_type"].pydantic_type_name
             self.file_open.write(field["field_name"] + ": " + pydantic_type)

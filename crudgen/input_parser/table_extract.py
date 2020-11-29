@@ -34,7 +34,9 @@ def map_dict_type(tables_dict: dict):
     authorized_input_type = list(TYPE_MAPPING.keys())
 
     for table in tables_name:
-        for field in tables_dict[table]:
+
+        tables_dict[table]["key_identifier"]["type"] = TYPE_MAPPING[tables_dict[table]["key_identifier"]["type"]]
+        for field in tables_dict[table]["fields"]:
             try:
                 field["field_type"] = TYPE_MAPPING[field["field_type"]]
             except KeyError:
