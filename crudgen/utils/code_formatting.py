@@ -27,6 +27,6 @@ def custom_import_declaration(custom_import):
 
 def imports_declaration(generate_imports):
     def inner(*arg):
-        return generate_imports(*arg) + "\n" + "\n"
+        return generate_imports(*arg) + "\n"
     return inner
 
