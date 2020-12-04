@@ -12,7 +12,7 @@ class SchemaGenerator:
     def __init__(self, table_name, table_fields: dict):
         self.table_name = table_name
         self.table_fields = table_fields
-        self.filename = "schema_{}.py".format(table_name)
+        self.filename = "{}_schema.py".format(table_name)
         self.file_open = open(config[CONFIG_ENV].SCHEMA_PACKAGE_PATH+self.filename, "a")
         
     def run(self):

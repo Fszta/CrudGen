@@ -1,9 +1,11 @@
+from test import setup
 from crudgen.utils.config import config, CONFIG_ENV
 from crudgen.utils.code_formatting import generic_import_declaration, custom_import_declaration, imports_declaration, function_declaration
 from crudgen.utils.indentation import Indentator
+from crudgen.utils.generator import Generator
 
 
-class RouterGenerator:
+class RouterGenerator(Generator):
     """
     Crud router generator, it creates a router_name.py file inside router package
     Following endpoints are implemented:
@@ -18,7 +20,7 @@ class RouterGenerator:
         self.table_name = table_name
         self.key_name = key_name
         self.key_type = key_type
-        self.filename = "router_{}.py".format(table_name)
+        self.filename = "{}_router.py".format(table_name)
         self.file_open = open(config[CONFIG_ENV].ROUTER_PACKAGE_PATH + self.filename, "a")
 
     @staticmethod
@@ -34,31 +36,13 @@ class RouterGenerator:
 
     @staticmethod
     @generic_import_declaration
-    def generate_sql_alchemy_import():
-        """ Generate sqlAlchemy session import"""
-        return "from sqlalchemy.orm import Session"
-
-    @staticmethod
-    @custom_import_declaration
-    def generate_schema_import(table_name):
-        """ Generate pydantic schema import based on table_name"""
-        return "from schema import schema_{}".format(table_name)
-
-    @staticmethod
-    @custom_import_declaration
-    def generate_controller_import(table_name):
-        """ Generate controller import based on table_name"""
-        return "from controller import controller_{}".format(table_name)
-
-    @staticmethod
-    @generic_import_declaration
     def generate_database_import():
         """ Generate init database import statement"""
         return "from database import get_db"
 
     @staticmethod
     @imports_declaration
-    def format_imports(fastapi,typing, sql_alchemy, schema, controller, database):
+    def format_imports(fastapi, typing, sql_alchemy, schema, controller, database):
         """ Generate all import statement of router"""
         global_import = fastapi + typing + sql_alchemy + schema + controller + database
         return global_import
@@ -66,7 +50,7 @@ class RouterGenerator:
     @staticmethod
     def router_declaration():
         """Init router declaration"""
-        return "router = APIRouter()" + "\n"
+        return "\nrouter = APIRouter()" + "\n"
 
     def generate_router_decorator(self, http_method: str, key: str, single_return: bool):
         """
@@ -82,9 +66,9 @@ class RouterGenerator:
             route = "/" + self.table_name + "/{" + key + "}"
 
         if single_return is True:
-            response_model = "schema_" + self.table_name + "." + self.table_name.capitalize()
+            response_model = self.table_name + "_schema" + "." + self.table_name.capitalize()
         elif single_return is False:
-            response_model = "List[" + "schema_" + self.table_name + "." + self.table_name.capitalize() + "]"
+            response_model = "List[" + self.table_name + "_schema" + "." + self.table_name.capitalize() + "]"
         tag = '["{}"]'.format(self.table_name)
 
         if single_return is None:
@@ -102,9 +86,10 @@ class RouterGenerator:
         """ Generate create route """
         decorator = self.generate_router_decorator("post", None, True) + "\n"
         function_definition = "async def create_" + self.table_name + "(" + self.table_name + ": " + \
-                              "schema_"+self.table_name+"."+self.table_name.capitalize() + ", db: Session = Depends(get_db)):" + "\n"
+                              self.table_name+"_schema"+"."+self.table_name.capitalize() + ", db: Session = " \
+                                                                                           "Depends(get_db)):" + "\n"
 
-        content = Indentator.IND_LEVEL_1 + "return controller_" + self.table_name +\
+        content = Indentator.IND_LEVEL_1 + "return " + self.table_name + "_controller" +\
                   ".create_" + self.table_name + "(db, {})".format(self.table_name)
 
         add_one_method = decorator + function_definition + content
@@ -119,7 +104,7 @@ class RouterGenerator:
             key,
             key_type
         )
-        content = Indentator.IND_LEVEL_1 + "db_{} = controller_{}.get_{}(db, {})".format(self.table_name,
+        content = Indentator.IND_LEVEL_1 + "db_{} = {}_controller.get_{}(db, {})".format(self.table_name,
                                                                                          self.table_name,
                                                                                          self.table_name, key) + "\n" +\
                   Indentator.IND_LEVEL_1 + "if db_{} is None:".format(self.table_name) + "\n" + \
@@ -135,7 +120,7 @@ class RouterGenerator:
 
         function_definition = "async def get_all_{}(db: Session = Depends(get_db)):".format(self.table_name)
 
-        content = Indentator.IND_LEVEL_1 + "all_db_{} = controller_{}.get_all_{}(db)"\
+        content = Indentator.IND_LEVEL_1 + "all_db_{} = {}_controller.get_all_{}(db)"\
             .format(self.table_name, self.table_name, self.table_name) + "\n" +\
                   Indentator.IND_LEVEL_1 + "if all_db_{} is None:".format(self.table_name) + "\n" + \
                   Indentator.IND_LEVEL_2 + 'raise HTTPException(status_code=404, detail="0 {} found, empty table")'\
@@ -151,7 +136,7 @@ class RouterGenerator:
         function_definition = "async def update_{}({}: {}, field_name: str, field_value: str," \
                               " db: Session = Depends(get_db)):".format(self.table_name, key, key_type)
         content = Indentator.IND_LEVEL_1 + "try:" + "\n" + \
-                  Indentator.IND_LEVEL_2 + "db_{} = controller_{}.update_{}(db, {}," \
+                  Indentator.IND_LEVEL_2 + "db_{} = {}_controller.update_{}(db, {}," \
                                            " field_name, field_value)".format(self.table_name,
                                                                       self.table_name, self.table_name, key) + "\n" + \
                   Indentator.IND_LEVEL_2 + "if db_{} is None:".format(self.table_name) + "\n" + \
@@ -173,7 +158,7 @@ class RouterGenerator:
             key,
             key_type
         )
-        content = Indentator.IND_LEVEL_1 + "controller_{}.delete_{}(db, {})".format(self.table_name, self.table_name, key)
+        content = Indentator.IND_LEVEL_1 + "{}_controller.delete_{}(db, {})".format(self.table_name, self.table_name, key)
 
         delete_one_method = decorator + function_definition + "\n" + content
 

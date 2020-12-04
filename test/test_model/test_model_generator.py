@@ -12,7 +12,7 @@ class TestModelGenerator(TestCase):
         """ Test model generation init create model_table.py file inside model package """
         files_in_dir = os.listdir(config["test"].MODEL_PACKAGE_PATH)
 
-        self.assertTrue("model_generated.py" in files_in_dir)
+        self.assertTrue("generated_model.py" in files_in_dir)
 
     def test_get_types(self):
         """ Test get set of unique sql alchemy type """
@@ -59,7 +59,7 @@ class TestModelGenerator(TestCase):
         test_generator.run()
 
         # Files path to compare
-        generated_model_path = config["test"].MODEL_PACKAGE_PATH + "model_generated.py"
+        generated_model_path = config["test"].MODEL_PACKAGE_PATH + "generated_model.py"
         expected_file_path = config["test"].MODEL_PACKAGE_PATH + "expected_model.py"
 
         # Check files content

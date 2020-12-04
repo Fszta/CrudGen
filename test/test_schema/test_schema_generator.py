@@ -18,10 +18,10 @@ class TestSchemaGenerator(unittest.TestCase):
         files_in_dir = os.listdir(config["test"].SCHEMA_PACKAGE_PATH)
         schema_generator.file_open.close()
 
-        self.assertTrue("schema_test.py" in files_in_dir)
+        self.assertTrue("test_schema.py" in files_in_dir)
 
         # Remove test file
-        os.remove(config["test"].SCHEMA_PACKAGE_PATH + "schema_test.py")
+        os.remove(config["test"].SCHEMA_PACKAGE_PATH + "test_schema.py")
 
     def test_run(self):
         """
@@ -56,7 +56,7 @@ class TestSchemaGenerator(unittest.TestCase):
         test_schema_generator.run()
 
         # Read generated test_schema
-        generated_file_path = config["test"].SCHEMA_PACKAGE_PATH + "schema_test.py"
+        generated_file_path = config["test"].SCHEMA_PACKAGE_PATH + "test_schema.py"
         generated_file = open(generated_file_path, "r")
 
         # Read expected test_schema
