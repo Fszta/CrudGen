@@ -13,7 +13,7 @@ class ModelGenerator:
     def __init__(self, name, fields: dict):
         self.name = name
         self.fields = fields
-        self.filename = "model_{}.py".format(name)
+        self.filename = "{}_model.py".format(name)
         self.file_open = open(config[CONFIG_ENV].MODEL_PACKAGE_PATH + self.filename, "a")
 
     def get_types(self):
