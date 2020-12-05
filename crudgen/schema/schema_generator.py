@@ -1,6 +1,7 @@
 from crudgen.utils.indentation import Indentator
 from crudgen.utils.config import config, CONFIG_ENV
 from crudgen.utils.logging import logger
+from crudgen.generator.tools import check_is_generated
 
 
 class SchemaGenerator:
@@ -9,18 +10,19 @@ class SchemaGenerator:
     Generate a schema.py file for the table pass
     as argument
     """
-    def __init__(self, table_name, table_fields: dict):
+    def __init__(self, table_name, table_fields: dict, output_path: str):
         self.table_name = table_name
         self.table_fields = table_fields
         self.filename = "{}_schema.py".format(table_name)
-        self.file_open = open(config[CONFIG_ENV].SCHEMA_PACKAGE_PATH+self.filename, "a")
-        
+        self.file_open = open(output_path + config[CONFIG_ENV].SCHEMA_PACKAGE_PATH+self.filename, "a")
+
+    @check_is_generated(package_name="schema")
     def run(self):
         """
-        Run test_schema file generation
-        Generate schema_name.py file inside test_schema package
+        Run schema file generation
+        Generate schema_name.py file inside schema package
         """
-        logger.info("Start {} test_schema generation".format(self.table_name))
+        logger.info("Start {} schema generation".format(self.table_name))
         # Add import package
         self.add_imports()
         self.jump_lines(3)
@@ -31,13 +33,15 @@ class SchemaGenerator:
         self.file_open.write(class_declaration)
         self.jump_lines(1)
 
-        # Write all fields defined in test_schema dict
+        # Write all fields defined in schema dict
         self.add_fields()
         self.file_open.close()
 
+        return self.filename
+
     def add_fields(self):
         """
-        Add fields to test_schema class
+        Add fields to schema class
         """
         for field in self.table_fields:
             self.file_open.write(Indentator.IND_LEVEL_1)

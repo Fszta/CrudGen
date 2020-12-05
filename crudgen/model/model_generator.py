@@ -1,20 +1,21 @@
 from crudgen.utils.config import config, CONFIG_ENV
 from crudgen.utils.indentation import Indentator
+from crudgen.generator.tools import check_is_generated
 
 
 class ModelGenerator:
     """
-    SQL Alchemy test_model generator.
-    Name will be used to create test_model file as :
+    SQL Alchemy model generator.
+    Name will be used to create model file as :
     model_name.py & also to name the corresponding
     table in database
     """
 
-    def __init__(self, name, fields: dict):
+    def __init__(self, name, fields: dict, output_path: str):
         self.name = name
         self.fields = fields
         self.filename = "{}_model.py".format(name)
-        self.file_open = open(config[CONFIG_ENV].MODEL_PACKAGE_PATH + self.filename, "a")
+        self.file_open = open(output_path + config[CONFIG_ENV].MODEL_PACKAGE_PATH + self.filename, "a")
 
     def get_types(self):
         """
@@ -92,6 +93,7 @@ class ModelGenerator:
         for i in range(0, number_of_jump):
             self.file_open.write("\n")
 
+    @check_is_generated(package_name="model")
     def run(self):
         """
         Run model generation base on input field which
@@ -122,3 +124,5 @@ class ModelGenerator:
 
         # Close generated file
         self.file_open.close()
+
+        return self.filename

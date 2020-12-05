@@ -1,6 +1,6 @@
-from test import setup
 from crudgen.utils.config import config, CONFIG_ENV
-from crudgen.utils.code_formatting import generic_import_declaration, custom_import_declaration, imports_declaration, function_declaration
+from crudgen.utils.code_formatting import generic_import_declaration, imports_declaration, function_declaration
+from crudgen.generator.tools import check_is_generated
 from crudgen.utils.indentation import Indentator
 from crudgen.utils.generator import Generator
 
@@ -16,12 +16,12 @@ class RouterGenerator(Generator):
     - deleted_one : delete one element from database, based on a field
     """
 
-    def __init__(self, table_name: str, key_name: str, key_type: str):
+    def __init__(self, table_name: str, key_name: str, key_type: str, output_path: str):
         self.table_name = table_name
         self.key_name = key_name
         self.key_type = key_type
         self.filename = "{}_router.py".format(table_name)
-        self.file_open = open(config[CONFIG_ENV].ROUTER_PACKAGE_PATH + self.filename, "a")
+        self.file_open = open(output_path + config[CONFIG_ENV].ROUTER_PACKAGE_PATH + self.filename, "a")
 
     @staticmethod
     @generic_import_declaration
@@ -164,6 +164,7 @@ class RouterGenerator(Generator):
 
         return delete_one_method
 
+    @check_is_generated(package_name="router")
     def run(self):
         fastapi_import = self.generate_fastapi_import()
         typing_import = self.typing_import()
@@ -188,3 +189,5 @@ class RouterGenerator(Generator):
                               get_one_method + get_all_method + update_method + delete_method
         self.file_open.write(router_file_content)
         self.file_open.close()
+
+        return self.filename

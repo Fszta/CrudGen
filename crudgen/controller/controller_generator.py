@@ -1,6 +1,7 @@
 from crudgen.utils.code_formatting import *
 from crudgen.utils.indentation import Indentator
 from crudgen.utils.config import config, CONFIG_ENV
+from crudgen.generator.tools import check_is_generated
 
 
 @generic_import_declaration
@@ -159,18 +160,20 @@ def generate_crud_functions(table_name: str, key: str, key_type: str, fields: di
            generate_update_function(table_name, key)
 
 
-def run(table_name: str, key: str, key_type: str, fields: dict):
+@check_is_generated(package_name="controller")
+def run(table_name: str, key: str, key_type: str, fields: dict, output_path: str):
     """
     Run controller generator. Create a table_name_controller file
     under controller packages. It contains following crud functions:
     * get one /get all / delete one / create one /update one
+    :param output_path: path of the directory containing generated api
     :param table_name: name of the table
     :param key: key use to identify sample ie: id
     :param key_type: type of the key
     :param fields: dict containing table attributs description
     """
     filename = f"{table_name}_controller.py"
-    file_controller = open(config[CONFIG_ENV].CONTROLLER_PACKAGE_PATH + filename, "a")
+    file_controller = open(output_path + config[CONFIG_ENV].CONTROLLER_PACKAGE_PATH + filename, "a")
 
     imports = format_imports(
         sql_alchemy_import(),
@@ -182,3 +185,4 @@ def run(table_name: str, key: str, key_type: str, fields: dict):
     file_controller.write(imports+crud_functions)
     file_controller.close()
 
+    return filename
