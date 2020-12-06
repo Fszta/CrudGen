@@ -1,19 +1,20 @@
 import os
+from crudgen.utils.config import config, CONFIG_ENV
 
 PACKAGES = ["controller", "model", "schema", "router", "database"]
-BASE = "generated_api"
+BASE = config[CONFIG_ENV].GENERATED_API_PATH
 
 
-def create_api_structure():
+def create_api_structure(output_path: str):
     """
     Create api package structure
-    Generate all defined test_packages inside Base
+    Generate all defined packages inside Base
     """
-    create_package(BASE, True)
-    [create_package(package, False) for package in PACKAGES]
+    create_package(output_path, True, output_path)
+    [create_package(package, False, output_path) for package in PACKAGES]
 
 
-def create_package(package_name: str, is_base: bool):
+def create_package(package_name: str, is_base: bool, output_path: str):
     """
     Create python package if not exists
 
@@ -21,7 +22,7 @@ def create_package(package_name: str, is_base: bool):
     :param is_base: bool - true is package is base (higher level)
     """
     if not is_base:
-        directory_path = BASE + "/" + package_name
+        directory_path = output_path + "/" + package_name
     else:
         directory_path = package_name
 

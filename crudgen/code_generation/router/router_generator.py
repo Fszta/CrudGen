@@ -1,13 +1,13 @@
 from crudgen.utils.config import config, CONFIG_ENV
-from crudgen.utils.code_formatting import generic_import_declaration, imports_declaration, function_declaration
-from crudgen.generator.tools import check_is_generated
-from crudgen.utils.indentation import Indentator
+from crudgen.code_generation.code_formatting import generic_import_declaration, imports_declaration, function_declaration
+from crudgen.code_generation.check import is_generated
+from crudgen.code_generation.indentation import Indentator
 from crudgen.utils.generator import Generator
 
 
 class RouterGenerator(Generator):
     """
-    Crud router generator, it creates a router_name.py file inside router package
+    Crud router code_generation, it creates a router_name.py file inside router package
     Following endpoints are implemented:
     - add one : add one element in database.
     - get one : get one element from database, based on a field.
@@ -164,7 +164,7 @@ class RouterGenerator(Generator):
 
         return delete_one_method
 
-    @check_is_generated(package_name="router")
+    @is_generated(package_name="router")
     def run(self):
         fastapi_import = self.generate_fastapi_import()
         typing_import = self.typing_import()

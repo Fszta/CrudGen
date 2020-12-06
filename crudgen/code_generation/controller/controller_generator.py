@@ -1,7 +1,7 @@
-from crudgen.utils.code_formatting import *
-from crudgen.utils.indentation import Indentator
+from crudgen.code_generation.code_formatting import *
+from crudgen.code_generation.indentation import Indentator
 from crudgen.utils.config import config, CONFIG_ENV
-from crudgen.generator.tools import check_is_generated
+from crudgen.code_generation.check import is_generated
 
 
 @generic_import_declaration
@@ -160,10 +160,10 @@ def generate_crud_functions(table_name: str, key: str, key_type: str, fields: di
            generate_update_function(table_name, key)
 
 
-@check_is_generated(package_name="controller")
+@is_generated(package_name="controller")
 def run(table_name: str, key: str, key_type: str, fields: dict, output_path: str):
     """
-    Run controller generator. Create a table_name_controller file
+    Run controller code_generation. Create a table_name_controller file
     under controller packages. It contains following crud functions:
     * get one /get all / delete one / create one /update one
     :param output_path: path of the directory containing generated api

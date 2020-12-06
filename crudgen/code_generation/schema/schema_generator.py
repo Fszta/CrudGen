@@ -1,12 +1,12 @@
-from crudgen.utils.indentation import Indentator
+from crudgen.code_generation.indentation import Indentator
 from crudgen.utils.config import config, CONFIG_ENV
 from crudgen.utils.logging import logger
-from crudgen.generator.tools import check_is_generated
+from crudgen.code_generation.check import is_generated
 
 
 class SchemaGenerator:
     """
-    Pydantic schema generator
+    Pydantic schema code_generation
     Generate a schema.py file for the table pass
     as argument
     """
@@ -16,7 +16,7 @@ class SchemaGenerator:
         self.filename = "{}_schema.py".format(table_name)
         self.file_open = open(output_path + config[CONFIG_ENV].SCHEMA_PACKAGE_PATH+self.filename, "a")
 
-    @check_is_generated(package_name="schema")
+    @is_generated(package_name="schema")
     def run(self):
         """
         Run schema file generation

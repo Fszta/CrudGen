@@ -1,11 +1,11 @@
 from crudgen.utils.config import config, CONFIG_ENV
-from crudgen.utils.indentation import Indentator
-from crudgen.generator.tools import check_is_generated
+from crudgen.code_generation.indentation import Indentator
+from crudgen.code_generation.check import is_generated
 
 
 class ModelGenerator:
     """
-    SQL Alchemy model generator.
+    SQL Alchemy model code_generation.
     Name will be used to create model file as :
     model_name.py & also to name the corresponding
     table in database
@@ -93,7 +93,7 @@ class ModelGenerator:
         for i in range(0, number_of_jump):
             self.file_open.write("\n")
 
-    @check_is_generated(package_name="model")
+    @is_generated(package_name="model")
     def run(self):
         """
         Run model generation base on input field which
