@@ -1,11 +1,12 @@
 from crudgen.utils.config import config, CONFIG_ENV
-from crudgen.code_generation.code_formatting import generic_import_declaration, imports_declaration, function_declaration
+from crudgen.code_generation.code_formatting import function_declaration
 from crudgen.code_generation.check import is_generated
 from crudgen.code_generation.indentation import Indentator
-from crudgen.utils.generator import Generator
+from crudgen.code_generation.imports import *
 
 
-class RouterGenerator(Generator):
+@is_generated(package_name="router")
+def run(table_name: str, output_path: str, key_name: str, key_type: str):
     """
     Crud router code_generation, it creates a router_name.py file inside router package
     Following endpoints are implemented:
@@ -14,180 +15,146 @@ class RouterGenerator(Generator):
     - get all : get all elements from database.
     - update one : update one element from database, based on a field
     - deleted_one : delete one element from database, based on a field
+    :param table_name: name of the table
+    :param output_path: path of the output directory
+    :param key_name: name of the key use to identify sample
+    :param key_type: type of the key
+    :return: boolean, generated filename
     """
 
-    def __init__(self, table_name: str, key_name: str, key_type: str, output_path: str):
-        self.table_name = table_name
-        self.key_name = key_name
-        self.key_type = key_type
-        self.filename = "{}_router.py".format(table_name)
-        self.file_open = open(output_path + config[CONFIG_ENV].ROUTER_PACKAGE_PATH + self.filename, "a")
+    filename = f"{table_name}_router.py"
+    file_router = open(output_path + config[CONFIG_ENV].ROUTER_PACKAGE_PATH + filename, "a")
 
-    @staticmethod
-    @generic_import_declaration
-    def generate_fastapi_import():
-        """ Generate fastApi import"""
-        return "from fastapi import APIRouter, HTTPException, Depends"
+    imports = format_imports(
+        fastapi_import(),
+        typing_import(),
+        sql_alchemy_import(),
+        schema_import(table_name),
+        controller_import(table_name),
+        database_import()
+    )
 
-    @staticmethod
-    @generic_import_declaration
-    def typing_import():
-        return "from typing import List"
+    create_method = generate_add_one(table_name)
+    get_one_method = generate_get_one(table_name,key_name, key_type)
+    get_all_method = generate_get_all(table_name)
+    update_method = generate_update_one(table_name, key_name, key_type)
+    delete_method = generate_delete_one(table_name, key_name, key_type)
 
-    @staticmethod
-    @generic_import_declaration
-    def generate_database_import():
-        """ Generate init database import statement"""
-        return "from database import get_db"
+    router_file_content = imports + router_declaration() + create_method + \
+                          get_one_method + get_all_method + update_method + delete_method
 
-    @staticmethod
-    @imports_declaration
-    def format_imports(fastapi, typing, sql_alchemy, schema, controller, database):
-        """ Generate all import statement of router"""
-        global_import = fastapi + typing + sql_alchemy + schema + controller + database
-        return global_import
+    file_router.write(router_file_content)
+    file_router.close()
 
-    @staticmethod
-    def router_declaration():
-        """Init router declaration"""
-        return "\nrouter = APIRouter()" + "\n"
+    return filename
 
-    def generate_router_decorator(self, http_method: str, key: str, single_return: bool):
-        """
-        Generate routing function decorator which defines route, parameters and return model.
-        :param http_method: get / post / create / update
-        :param key: key to of the element in table, could be None for get_all method
-        :param single_return: True if route return single element, otherwise False
-        :return: string containing route_decorator
-        """
-        if key is None:
-            route = "/" + self.table_name
-        else:
-            route = "/" + self.table_name + "/{" + key + "}"
 
-        if single_return is True:
-            response_model = self.table_name + "_schema" + "." + self.table_name.capitalize()
-        elif single_return is False:
-            response_model = "List[" + self.table_name + "_schema" + "." + self.table_name.capitalize() + "]"
-        tag = '["{}"]'.format(self.table_name)
+def router_declaration():
+    """Init router declaration"""
+    return "\nrouter = APIRouter()" + "\n"
 
-        if single_return is None:
-            router_decorator = '@router.{}("{}", tags={})'.format(http_method, route, tag)
-        else:
-            router_decorator = '@router.{}("{}", response_model={}, tags={})'.format(http_method,
-                                                                                     route,
-                                                                                     response_model,
-                                                                                     tag)
 
-        return router_decorator
+def generate_router_decorator(table_name: str, http_method: str, key: str, single_return: bool):
+    """
+    Generate routing function decorator which defines route, parameters and return model.
+    :param table_name: name of the table
+    :param http_method: get / post / create / update
+    :param key: key to of the element in table, could be None for get_all method
+    :param single_return: True if route return single element, otherwise False
+    :return: string containing route_decorator
+    """
+    if key is None:
+        route = "/" + table_name
+    else:
+        route = "/" + table_name + "/{" + key + "}"
+    if single_return is True:
+        response_model = table_name + "_schema" + "." + table_name.capitalize()
+    elif single_return is False:
+        response_model = "List[" + table_name + "_schema" + "." + table_name.capitalize() + "]"
+    tag = f'["{table_name}"]'
 
-    @function_declaration
-    def generate_add_one(self):
-        """ Generate create route """
-        decorator = self.generate_router_decorator("post", None, True) + "\n"
-        function_definition = "async def create_" + self.table_name + "(" + self.table_name + ": " + \
-                              self.table_name+"_schema"+"."+self.table_name.capitalize() + ", db: Session = " \
-                                                                                           "Depends(get_db)):" + "\n"
+    if single_return is None:
+        router_decorator = f'@router.{http_method}("{route}", tags={tag})'
+    else:
+        router_decorator = f'@router.{http_method}("{route}", response_model={response_model}, tags={tag})'
 
-        content = Indentator.IND_LEVEL_1 + "return " + self.table_name + "_controller" +\
-                  ".create_" + self.table_name + "(db, {})".format(self.table_name)
+    return router_decorator
 
-        add_one_method = decorator + function_definition + content
 
-        return add_one_method
+@function_declaration
+def generate_add_one(table_name: str):
+    """ Generate create route """
+    decorator = generate_router_decorator(table_name, "post", None, True) + "\n"
+    function_definition = "async def create_" + table_name + "(" + table_name + ": " + \
+                          table_name + "_schema" + "." + table_name.capitalize() + ", db: Session = " \
+                                                                                   "Depends(get_db)):" + "\n"
 
-    @function_declaration
-    def generate_get_one(self, key: str, key_type: str):
-        decorator = self.generate_router_decorator("get", key, True) + "\n"
-        function_definition = "async def get_{}({}: {}, db: Session = Depends(get_db)):".format(
-            self.table_name,
-            key,
-            key_type
-        )
-        content = Indentator.IND_LEVEL_1 + "db_{} = {}_controller.get_{}(db, {})".format(self.table_name,
-                                                                                         self.table_name,
-                                                                                         self.table_name, key) + "\n" +\
-                  Indentator.IND_LEVEL_1 + "if db_{} is None:".format(self.table_name) + "\n" + \
-                  Indentator.IND_LEVEL_2 + 'raise HTTPException(status_code=404, detail="{} not found")'.format(self.table_name) + "\n" + \
-                  Indentator.IND_LEVEL_1 + "return db_{}".format(self.table_name)
+    content = Indentator.IND_LEVEL_1 + "return " + table_name + "_controller" + \
+              ".create_" + table_name + f"(db, {table_name})"
 
-        get_one_method = decorator + function_definition + "\n" + content
-        return get_one_method
+    add_one_method = decorator + function_definition + content
 
-    @function_declaration
-    def generate_get_all(self):
-        decorator = self.generate_router_decorator("get", None, False) + "\n"
+    return add_one_method
 
-        function_definition = "async def get_all_{}(db: Session = Depends(get_db)):".format(self.table_name)
 
-        content = Indentator.IND_LEVEL_1 + "all_db_{} = {}_controller.get_all_{}(db)"\
-            .format(self.table_name, self.table_name, self.table_name) + "\n" +\
-                  Indentator.IND_LEVEL_1 + "if all_db_{} is None:".format(self.table_name) + "\n" + \
-                  Indentator.IND_LEVEL_2 + 'raise HTTPException(status_code=404, detail="0 {} found, empty table")'\
-                      .format(self.table_name) + "\n" + \
-                  Indentator.IND_LEVEL_1 + "return all_db_{}".format(self.table_name)
+@function_declaration
+def generate_get_one(table_name: str, key: str, key_type: str):
+    decorator = generate_router_decorator(table_name, "get", key, True) + "\n"
+    function_definition = "async def get_{}({}: {}, db: Session = Depends(get_db)):".format(
+        table_name,
+        key,
+        key_type
+    )
+    content = Indentator.IND_LEVEL_1 + f"db_{table_name} = {table_name}_controller.get_{table_name}(db, {key})\n" +  \
+              Indentator.IND_LEVEL_1 + f"if db_{table_name} is None:" + "\n" + \
+              Indentator.IND_LEVEL_2 + f'raise HTTPException(status_code=404, detail="{table_name} not found")\n' + \
+              Indentator.IND_LEVEL_1 + "return db_{}".format(table_name)
 
-        get_all_method = decorator + function_definition + "\n" + content
-        return get_all_method
+    get_one_method = decorator + function_definition + "\n" + content
+    return get_one_method
 
-    @function_declaration
-    def generate_update_one(self, key, key_type):
-        decorator = self.generate_router_decorator("put", key, None) + "\n"
-        function_definition = "async def update_{}({}: {}, field_name: str, field_value: str," \
-                              " db: Session = Depends(get_db)):".format(self.table_name, key, key_type)
-        content = Indentator.IND_LEVEL_1 + "try:" + "\n" + \
-                  Indentator.IND_LEVEL_2 + "db_{} = {}_controller.update_{}(db, {}," \
-                                           " field_name, field_value)".format(self.table_name,
-                                                                      self.table_name, self.table_name, key) + "\n" + \
-                  Indentator.IND_LEVEL_2 + "if db_{} is None:".format(self.table_name) + "\n" + \
-                  Indentator.IND_LEVEL_3 + 'raise HTTPException(status_code=404, detail="{} not found")'\
-                      .format(self.table_name) + "\n" + \
-                  Indentator.IND_LEVEL_2 + "return db_{}".format(self.table_name).format(self.table_name) + "\n" + \
-                  Indentator.IND_LEVEL_1 + "except ValueError as error:" + "\n" + \
-                  Indentator.IND_LEVEL_2 + "raise HTTPException(status_code=400, detail=str(error))"
 
-        update_method = decorator + function_definition + "\n" + content
+@function_declaration
+def generate_get_all(table_name: str):
+    decorator = generate_router_decorator(table_name, "get", None, False) + "\n"
 
-        return update_method
+    function_definition = f"async def get_all_{table_name}(db: Session = Depends(get_db)):"
 
-    @function_declaration
-    def generate_delete_one(self, key: str, key_type: str):
-        decorator = self.generate_router_decorator("delete", key, None) + "\n"
-        function_definition = "async def delete_{}({}: {}, db: Session = Depends(get_db)):".format(
-            self.table_name,
-            key,
-            key_type
-        )
-        content = Indentator.IND_LEVEL_1 + "{}_controller.delete_{}(db, {})".format(self.table_name, self.table_name, key)
+    content = Indentator.IND_LEVEL_1 + f"all_db_{table_name} = {table_name}_controller.get_all_{table_name}(db)\n"  + \
+              Indentator.IND_LEVEL_1 + f"if all_db_{table_name} is None:" + "\n" + \
+              Indentator.IND_LEVEL_2 + f'raise HTTPException(status_code=404,' \
+                                       f' detail="0 {table_name} found, empty table")\n' + \
+              Indentator.IND_LEVEL_1 + f"return all_db_{table_name}"
 
-        delete_one_method = decorator + function_definition + "\n" + content
+    get_all_method = decorator + function_definition + "\n" + content
+    return get_all_method
 
-        return delete_one_method
 
-    @is_generated(package_name="router")
-    def run(self):
-        fastapi_import = self.generate_fastapi_import()
-        typing_import = self.typing_import()
-        schema_import = self.generate_schema_import(self.table_name)
-        sql_alchemy_import = self.generate_sql_alchemy_import()
-        database_import = self.generate_database_import()
-        controller_import = self.generate_controller_import(self.table_name)
-        all_imports = self.format_imports(fastapi_import,
-                                          typing_import,
-                                          sql_alchemy_import,
-                                          schema_import,
-                                          controller_import,
-                                          database_import
-                                          )
+@function_declaration
+def generate_update_one(table_name: str, key: str, key_type: str):
+    decorator = generate_router_decorator(table_name, "put", key, None) + "\n"
+    function_definition = f"async def update_{table_name}({key}: {key_type}, field_name: str, field_value: str," \
+                          " db: Session = Depends(get_db)):"
+    content = Indentator.IND_LEVEL_1 + "try:" + "\n" + \
+              Indentator.IND_LEVEL_2 + f"db_{table_name} = {table_name}_controller.update_{table_name}(db, {key}," \
+                                       " field_name, field_value)" + "\n" + \
+              Indentator.IND_LEVEL_2 + f"if db_{table_name} is None:" + "\n" + \
+              Indentator.IND_LEVEL_3 + f'raise HTTPException(status_code=404, detail="{table_name} not found")\n' + \
+              Indentator.IND_LEVEL_2 + f"return db_{table_name}" + "\n" + \
+              Indentator.IND_LEVEL_1 + "except ValueError as error:" + "\n" + \
+              Indentator.IND_LEVEL_2 + "raise HTTPException(status_code=400, detail=str(error))"
 
-        create_method = self.generate_add_one()
-        get_one_method = self.generate_get_one(self.key_name, self.key_type)
-        get_all_method = self.generate_get_all()
-        update_method = self.generate_update_one(self.key_name, self.key_type)
-        delete_method = self.generate_delete_one(self.key_name, self.key_type)
-        router_file_content = all_imports + self.router_declaration() + create_method +\
-                              get_one_method + get_all_method + update_method + delete_method
-        self.file_open.write(router_file_content)
-        self.file_open.close()
+    update_method = decorator + function_definition + "\n" + content
 
-        return self.filename
+    return update_method
+
+
+@function_declaration
+def generate_delete_one(table_name: str, key: str, key_type: str):
+    decorator = generate_router_decorator(table_name, "delete", key, None) + "\n"
+    function_definition = f"async def delete_{table_name}({key}: {key_type}, db: Session = Depends(get_db)):"
+    content = Indentator.IND_LEVEL_1 + f"{table_name}_controller.delete_{table_name}(db, {key})"
+
+    delete_one_method = decorator + function_definition + "\n" + content
+
+    return delete_one_method
