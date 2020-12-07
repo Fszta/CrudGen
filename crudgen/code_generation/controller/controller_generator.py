@@ -2,45 +2,35 @@ from crudgen.code_generation.code_formatting import *
 from crudgen.code_generation.indentation import Indentator
 from crudgen.utils.config import config, CONFIG_ENV
 from crudgen.code_generation.check import is_generated
+from crudgen.code_generation.imports import sql_alchemy_session_import, format_imports, schema_import, model_import
 
 
-@generic_import_declaration
-def typing_import():
-    return "from typing import List"
-
-
-@generic_import_declaration
-def sql_alchemy_import():
-    """ Generate sqlAlchemy session import"""
-    return "from sqlalchemy.orm import Session"
-
-
-@custom_import_declaration
-def schema_import(table_name):
-    """ Generate pydantic schema import based on table_name"""
-    return "from schema import {}_schema".format(table_name)
-
-
-@custom_import_declaration
-def controller_import(table_name):
-    """ Generate controller import based on table_name"""
-    return "from controller import {}_controller".format(table_name)
-
-
-@custom_import_declaration
-def model_import(table_name):
-    """ Generate controller import based on table_name"""
-    return "from model import {}_model".format(table_name)
-
-
-@imports_declaration
-def format_imports(*args):
+@is_generated(package_name="controller")
+def run(table_name: str, key: str, key_type: str, fields: dict, output_path: str):
     """
-    Generate & format controller imports.
-    :return: formated imports
+    Run controller code_generation. Create a table_name_controller file
+    under controller packages. It contains following crud functions:
+    * get one /get all / delete one / create one /update one
+    :param output_path: path of the directory containing generated api
+    :param table_name: name of the table
+    :param key: key use to identify sample ie: id
+    :param key_type: type of the key
+    :param fields: dict containing table attributs description
     """
-    imports = "".join(args)
-    return imports
+    filename = f"{table_name}_controller.py"
+    file_controller = open(output_path + config[CONFIG_ENV].CONTROLLER_PACKAGE_PATH + filename, "a")
+
+    imports = format_imports(
+        sql_alchemy_session_import(),
+        schema_import(table_name),
+        model_import(table_name)
+    )
+
+    crud_functions = generate_crud_functions(table_name, key, key_type, fields)
+    file_controller.write(imports+crud_functions)
+    file_controller.close()
+
+    return filename
 
 
 @function_declaration
@@ -114,7 +104,7 @@ def generate_create_function(table_name: str, fields: dict):
     function_definition = f"def create_{table_name}(db: Session, {table_name}: {table_name}_schema.{model_class}):\n"
     content = Indentator.IND_LEVEL_1 + f"db_{table_name} = {table_name}_model.{model_class}(\n" + \
               "".join([Indentator.IND_LEVEL_2 + f"{field['field_name']}={table_name}.{field['field_name']}," +
-                       "\n" for field in fields]) +\
+                       "\n" for field in fields]) + \
               Indentator.IND_LEVEL_1 + ")\n" + \
               Indentator.IND_LEVEL_1 + f"db.add(db_{table_name})" + "\n" + \
               Indentator.IND_LEVEL_1 + "db.commit()" + "\n" + \
@@ -158,31 +148,3 @@ def generate_crud_functions(table_name: str, key: str, key_type: str, fields: di
            generate_delete_function(table_name, key) + \
            generate_create_function(table_name, fields) + \
            generate_update_function(table_name, key)
-
-
-@is_generated(package_name="controller")
-def run(table_name: str, key: str, key_type: str, fields: dict, output_path: str):
-    """
-    Run controller code_generation. Create a table_name_controller file
-    under controller packages. It contains following crud functions:
-    * get one /get all / delete one / create one /update one
-    :param output_path: path of the directory containing generated api
-    :param table_name: name of the table
-    :param key: key use to identify sample ie: id
-    :param key_type: type of the key
-    :param fields: dict containing table attributs description
-    """
-    filename = f"{table_name}_controller.py"
-    file_controller = open(output_path + config[CONFIG_ENV].CONTROLLER_PACKAGE_PATH + filename, "a")
-
-    imports = format_imports(
-        sql_alchemy_import(),
-        schema_import(table_name),
-        model_import(table_name)
-    )
-
-    crud_functions = generate_crud_functions(table_name, key, key_type, fields)
-    file_controller.write(imports+crud_functions)
-    file_controller.close()
-
-    return filename

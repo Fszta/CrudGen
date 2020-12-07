@@ -28,10 +28,10 @@ def run(table_name: str, output_path: str, key_name: str, key_type: str):
     imports = format_imports(
         fastapi_import(),
         typing_import(),
-        sql_alchemy_import(),
+        sql_alchemy_session_import(),
         schema_import(table_name),
         controller_import(table_name),
-        database_import()
+        db_init_import()
     )
 
     create_method = generate_add_one(table_name)
