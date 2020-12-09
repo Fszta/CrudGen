@@ -2,63 +2,50 @@ from crudgen.code_generation.indentation import Indentator
 from crudgen.utils.config import config, CONFIG_ENV
 from crudgen.utils.logging import logger
 from crudgen.code_generation.check import is_generated
+from crudgen.code_generation.imports import pydantic_import, format_imports
+from crudgen.code_generation.code_formatting import class_declare
 
 
-class SchemaGenerator:
+@is_generated(package_name="schema")
+def run(table_name: str, table_fields: dict, output_path: str):
     """
-    Pydantic schema code_generation
-    Generate a schema.py file for the table pass
-    as argument
+    Run schema file generation
+    Generate schema_name.py file inside schema package
     """
-    def __init__(self, table_name, table_fields: dict, output_path: str):
-        self.table_name = table_name
-        self.table_fields = table_fields
-        self.filename = "{}_schema.py".format(table_name)
-        self.file_open = open(output_path + config[CONFIG_ENV].SCHEMA_PACKAGE_PATH+self.filename, "a")
+    logger.info(f"Start {table_name} schema generation")
 
-    @is_generated(package_name="schema")
-    def run(self):
-        """
-        Run schema file generation
-        Generate schema_name.py file inside schema package
-        """
-        logger.info("Start {} schema generation".format(self.table_name))
-        # Add import package
-        self.add_imports()
-        self.jump_lines(3)
+    filename = f"{table_name}_schema.py"
+    file_schema = open(output_path + config[CONFIG_ENV].SCHEMA_PACKAGE_PATH + filename, "a")
 
-        # Write class name
-        class_name = self.table_name.capitalize()
-        class_declaration = "class " + class_name + "(BaseModel):"
-        self.file_open.write(class_declaration)
-        self.jump_lines(1)
+    imports = format_imports(pydantic_import())
+    class_declaration = declare_schema_class(table_name)
+    content = imports + class_declaration + schema_fields(table_fields)
 
-        # Write all fields defined in schema dict
-        self.add_fields()
-        self.file_open.close()
+    file_schema.write(content)
+    file_schema.close()
 
-        return self.filename
+    return filename
 
-    def add_fields(self):
-        """
-        Add fields to schema class
-        """
-        for field in self.table_fields:
-            self.file_open.write(Indentator.IND_LEVEL_1)
-            pydantic_type = field["field_type"].pydantic_type_name
-            self.file_open.write(field["field_name"] + ": " + pydantic_type)
-            self.jump_lines(1)
 
-    def add_imports(self):
-        """
-        Add import statements
-        """
-        self.file_open.write("from pydantic import BaseModel")
+@class_declare
+def declare_schema_class(table_name: str):
+    """
+    Schema class declaration
+    :param table_name: name of the table
+    :return: class declaration string
+    """
+    class_name = table_name.capitalize()
+    return f"class {class_name}(BaseModel):"
 
-    def jump_lines(self, number_of_jump):
-        """
-        Jump lines in file
-        :param number_of_jump: number of line to jump, 0 = return to line
-        """
-        for i in range(0, number_of_jump):
-            self.file_open.write("\n")
+
+def schema_fields(fields: dict):
+    """
+    Generate schema fields
+    :param fields: table fields dict
+    :return: string containing formated fields
+    """
+    schema_fields = [Indentator.IND_LEVEL_1 + field["field_name"] + ": " + field["field_type"].pydantic_type_name +
+                     "\n" for field in fields]
+    return "".join(schema_fields)
+
+

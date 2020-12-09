@@ -1,26 +1,12 @@
 import unittest
 import os
 
-from crudgen.code_generation.schema.schema_generator import SchemaGenerator
+from crudgen.code_generation.schema import schema_generator
 from crudgen.input_parser.type_mapper import TypeMapper
 from crudgen.utils.config import config
 
 
 class TestSchemaGenerator(unittest.TestCase):
-    def test_init(self):
-        """
-        Test SchemaGenerator initialization
-        schema_name.py should be created in schema
-        package
-        """
-        schema_generator = SchemaGenerator("test", {}, "")
-        files_in_dir = os.listdir(config["test"].SCHEMA_PACKAGE_PATH)
-        schema_generator.file_open.close()
-
-        self.assertTrue("test_schema.py" in files_in_dir)
-
-        # Remove test file
-        os.remove(config["test"].SCHEMA_PACKAGE_PATH + "test_schema.py")
 
     def test_run(self):
         """
@@ -51,8 +37,7 @@ class TestSchemaGenerator(unittest.TestCase):
             },
         ]
 
-        test_schema_generator = SchemaGenerator("test", test_fields, "")
-        test_schema_generator.run()
+        schema_generator.run("test", test_fields, "")
 
         # Read generated schema
         generated_file_path = config["test"].SCHEMA_PACKAGE_PATH + "test_schema.py"
