@@ -29,7 +29,7 @@ class TestImports(TestCase):
 
     def test_database_import(self):
         """ Test database import generation """
-        expected_import = "from database import get_db" + "\n"
+        expected_import = "from database.db_init import get_db" + "\n"
         generated_import = db_init_import()
         self.assertEqual(expected_import, generated_import)
 

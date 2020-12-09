@@ -57,7 +57,7 @@ def model_import(table_name):
 @generic_import_declaration
 def db_init_import():
     """ Generate init database import statement"""
-    return "from database import get_db"
+    return "from database.db_init import get_db"
 
 
 @generic_import_declaration
@@ -69,3 +69,8 @@ def db_base_import():
 def fastapi_import():
     """ Generate fastApi import"""
     return "from fastapi import APIRouter, HTTPException, Depends"
+
+
+@generic_import_declaration
+def pydantic_import():
+    return "from pydantic import BaseModel"
