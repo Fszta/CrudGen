@@ -13,7 +13,14 @@ def format_imports(*args):
 
 
 @generic_import_declaration
+def uvicorn_import():
+    """ Generate uvicorn import"""
+    return "import uvicorn"
+
+
+@generic_import_declaration
 def typing_import():
+    """ Generate typing import """
     return "from typing import List"
 
 
@@ -60,9 +67,13 @@ def db_init_import():
     return "from database.db_init import get_db"
 
 
-@generic_import_declaration
-def db_base_import():
-    return "from database.db_init import Base"
+@custom_import_declaration
+def db_base_import(entrypoint: bool):
+    base = "from database.db_init import Base"
+    if entrypoint:
+        return base + ", engine"
+    else:
+        return base
 
 
 @generic_import_declaration
@@ -74,3 +85,16 @@ def fastapi_import():
 @generic_import_declaration
 def pydantic_import():
     return "from pydantic import BaseModel"
+
+
+@custom_import_declaration
+def routers_import(tables: list):
+    """ Generate routers import """
+    table_routers = [table + "_router" for table in tables]
+    routers = "from router import " + ", ".join(table_routers)
+    return routers
+
+
+@generic_import_declaration
+def fastapi_core_import():
+    return "from fastapi import FastAPI"

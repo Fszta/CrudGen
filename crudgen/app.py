@@ -1,3 +1,4 @@
+import os
 from crudgen.utils.logging import logger
 from crudgen.utils.config import config, CONFIG_ENV
 from crudgen.input_parser.table_extract import extract_table_structure
@@ -7,6 +8,7 @@ from crudgen.code_generation.model import model_generator
 from crudgen.code_generation.database.db_init_generator import generate_db_init_file
 from crudgen.code_generation.router import router_generator
 from crudgen.code_generation.controller import controller_generator
+from crudgen.code_generation.launcher import launcher_generator
 from crudgen.input_parser.arguments import set_parameters
 from crudgen.utils.exceptions import *
 
@@ -24,6 +26,8 @@ def start():
 
     # Extract input file content
     tables_content = extract_table_structure(user_arguments.file)
+
+    launcher_generator.run(list(tables_content.keys()), "0.0.0.0", 8080, os.getenv("OUTPUT_PATH"))
 
     # Generate crud foreach table describe in input file
     [generate(table, fields, full_output_path) for table, fields in tables_content.items()]

@@ -24,7 +24,7 @@ def set_parameters():
         logger.warn(f"--name parameter is unset, set default to {config[CONFIG_ENV].GENERATED_API_PATH}")
         user_arguments.name = config[CONFIG_ENV].GENERATED_API_PATH
 
-    os.environ["OUTPUT_PATH"] = user_arguments.output_dir + user_arguments.name
+    os.environ["OUTPUT_PATH"] = user_arguments.output_dir + user_arguments.name + "/"
 
     return user_arguments
 

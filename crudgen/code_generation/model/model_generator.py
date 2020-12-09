@@ -18,7 +18,7 @@ def run(table_name: str, fields: dict, output_path: str):
     file_model = open(output_path + config[CONFIG_ENV].MODEL_PACKAGE_PATH + filename, "a")
 
     sql_alchemy_types = get_types(fields)
-    imports = format_imports(build_sql_alchemy_import(sql_alchemy_types), db_base_import())
+    imports = format_imports(build_sql_alchemy_import(sql_alchemy_types), db_base_import(False))
     model_attributes = build_all_attributes(fields)
     content = imports + declare_class(table_name) + set_table_name(table_name) + model_attributes
 
