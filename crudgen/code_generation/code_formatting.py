@@ -1,12 +1,3 @@
-from crudgen.utils.logging import logger
-
-
-def class_declaration(declaration):
-    def inner():
-        return declaration()
-
-    return inner
-
 
 def function_declaration(declaration):
     def inner(*args):
@@ -35,5 +26,12 @@ def custom_import_declaration(custom_import):
 def imports_declaration(generate_imports):
     def inner(*arg):
         return generate_imports(*arg) + "\n"
+
+    return inner
+
+
+def class_declare(declare):
+    def inner(*args):
+        return "\n" + declare(*args) + "\n"
 
     return inner
