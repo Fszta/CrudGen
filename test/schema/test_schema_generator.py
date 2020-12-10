@@ -53,3 +53,10 @@ class TestSchemaGenerator(unittest.TestCase):
 
         # Remove deleted file
         os.remove(generated_file_path)
+
+    def test_activate_orm_mode(self):
+        """ Test orm mode activation """
+        expected = "\n    class Config:\n" + \
+                   "        orm_mode = True\n"
+        generated_statement = schema_generator.orm_mode()
+        self.assertEqual(expected, generated_statement)
