@@ -49,7 +49,7 @@ def schema_fields(fields: dict):
     :return: string containing formated fields
     """
     schema_fields = [Indentator.IND_LEVEL_1 + field["field_name"] + ": " + field["field_type"].pydantic_type_name +
-                     "\n" for field in fields]
+                     "\n" for field in fields if field["primary_key"] is False]
     return "".join(schema_fields)
 
 
