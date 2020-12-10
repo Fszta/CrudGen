@@ -104,7 +104,7 @@ def generate_create_function(table_name: str, fields: dict):
     function_definition = f"def create_{table_name}(db: Session, {table_name}: {table_name}_schema.{model_class}):\n"
     content = Indentator.IND_LEVEL_1 + f"db_{table_name} = {table_name}_model.{model_class}(\n" + \
               "".join([Indentator.IND_LEVEL_2 + f"{field['field_name']}={table_name}.{field['field_name']}," +
-                       "\n" for field in fields]) + \
+                       "\n" for field in fields if field["primary_key"] is False]) + \
               Indentator.IND_LEVEL_1 + ")\n" + \
               Indentator.IND_LEVEL_1 + f"db.add(db_{table_name})" + "\n" + \
               Indentator.IND_LEVEL_1 + "db.commit()" + "\n" + \

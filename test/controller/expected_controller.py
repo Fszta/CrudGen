@@ -24,7 +24,6 @@ def delete_generated(db: Session, id):
 
 def create_generated(db: Session, generated: generated_schema.Generated):
     db_generated = generated_model.Generated(
-        id=generated.id,
         name=generated.name,
         age=generated.age,
     )

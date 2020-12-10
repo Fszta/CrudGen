@@ -37,7 +37,6 @@ class TestControllerGenerator(TestCase):
     def test_generate_create_function(self):
         expected = "\n\ndef create_generated(db: Session, generated: generated_schema.Generated):" + "\n" + \
                    "    db_generated = generated_model.Generated(" + "\n" + \
-                   "        id=generated.id," + "\n" + \
                    "        name=generated.name," + "\n" + \
                    "        age=generated.age," + "\n" + \
                    "    )" + "\n" + \
