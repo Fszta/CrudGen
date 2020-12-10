@@ -11,6 +11,10 @@ def run(table_name: str, table_fields: dict, output_path: str):
     """
     Run schema file generation
     Generate schema_name.py file inside schema package
+    :param table_name: name of the table
+    :param table_fields: description of table field (name, type...)
+    :param output_path: path of the output directory
+    :return: generated filename
     """
     logger.info(f"Start {table_name} schema generation")
 
@@ -19,7 +23,7 @@ def run(table_name: str, table_fields: dict, output_path: str):
 
     imports = format_imports(pydantic_import())
     class_declaration = declare_schema_class(table_name)
-    content = imports + class_declaration + schema_fields(table_fields)
+    content = imports + class_declaration + schema_fields(table_fields) + orm_mode()
 
     file_schema.write(content)
     file_schema.close()
@@ -49,3 +53,9 @@ def schema_fields(fields: dict):
     return "".join(schema_fields)
 
 
+@class_declare
+def orm_mode():
+    """Activate orm mode config"""
+    activate_orm_mode = Indentator.IND_LEVEL_1 + "class Config:\n" + \
+                        Indentator.IND_LEVEL_2 + "orm_mode = True"
+    return activate_orm_mode
