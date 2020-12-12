@@ -126,7 +126,11 @@ Input file content : example.json
 ```
 According to example.json, crud for two tables will be generated : user and city. 
 With the previous command, api will start automatically, swagger docs will be accessible at http://0.0.0.0:8080/docs 
-You'll find the following page which allows you to try out every endpoints
+You'll find the following page which allows you to try out every endpoints:
+<p align="center">
+  <img src="example/open-api.png" title="swagger-ui">
+</p>
+
 
 ### Fields description
 * First field: table's name (user & city in example.json)
