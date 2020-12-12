@@ -1,4 +1,3 @@
-from test import setup
 from crudgen.utils.logging import logger
 from crudgen.code_generation.indentation import Indentator
 from crudgen.code_generation.code_formatting import function_declaration
@@ -9,8 +8,16 @@ from crudgen.code_generation.imports import uvicorn_import, fastapi_core_import,
 
 @is_generated(package_name="")
 def run(tables_name: list, host: str, port: int, output_path: str):
-    logger.info(f"Start app entrypoint generation")
-    filename = f"app.py"
+    """
+    Create app.py file, the entrypoint of the api under root directory
+    :param tables_name: name of the table
+    :param host: host of the generated api
+    :param port: port of the generated api
+    :param output_path: path of the output directory
+    :return: generated filename
+    """
+    logger.info(f"Start app entrypoint generation under {output_path}")
+    filename = "app.py"
     file_app = open(output_path + filename, "a")
 
     imports = format_imports(
