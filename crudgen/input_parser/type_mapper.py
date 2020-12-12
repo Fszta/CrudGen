@@ -10,6 +10,8 @@ class TypeMapper:
 TYPE_MAPPING = {
     "string": TypeMapper("str", "String"),
     "integer": TypeMapper("int", "Integer"),
-    "boolean": TypeMapper("bool", "Boolean")
+    "boolean": TypeMapper("bool", "Boolean"),
+    "datetime": TypeMapper("datetime", "DateTime"),
+    "float":    TypeMapper("float", "Float")
 }
 
