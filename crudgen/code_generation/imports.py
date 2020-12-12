@@ -98,3 +98,8 @@ def routers_import(tables: list):
 @generic_import_declaration
 def fastapi_core_import():
     return "from fastapi import FastAPI"
+
+
+@generic_import_declaration
+def datetime_import():
+    return "from datetime import datetime"

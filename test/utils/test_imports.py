@@ -80,3 +80,9 @@ class TestImports(TestCase):
             "from database import get_db" + "\n"
         )
         self.assertEqual(expected_imports, generated_imports)
+
+    def test_datetime_import(self):
+        """ Test datetime import """
+        expected = "from datetime import datetime\n"
+        generated = datetime_import()
+        self.assertEqual(expected, generated)
