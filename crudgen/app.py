@@ -11,52 +11,80 @@ from crudgen.code_generation.controller import controller_generator
 from crudgen.code_generation.launcher import launcher_generator
 from crudgen.input_parser.arguments import set_parameters
 from crudgen.utils.exceptions import *
+from crudgen.input_parser.arguments import UserArgs
 
 
-def start():
-    user_arguments = set_parameters()
-    logger.info("Start CrudGen {} ...".format(config[CONFIG_ENV].VERSION))
-    full_output_path = user_arguments.output_dir + "/" + user_arguments.name
+class Crudgen:
+    def __init__(self, user_args: UserArgs):
+        self.user_args = user_args
+        self.output_path = user_args.output_dir + user_args.name + "/"
 
-    # Create generated api layout
-    create_api_structure(full_output_path)
+    def create_common_files(self, tables_content):
+        """
+        Generate needed common files and directory whatever
+        the number of tables. Following files / dir are created :
+        - package structure : schema / model / controller / router / database
+        - db_init.py under database package
+        - app.py under the root directory
+        """
 
-    # Create db initialization file
-    generate_db_init_file(full_output_path)
+        create_api_structure(self.output_path)
+        generate_db_init_file(self.output_path)
+        launcher_generator.run(list(tables_content.keys()), "0.0.0.0", 8080, self.output_path)
 
-    # Extract input file content
-    tables_content = extract_table_structure(user_arguments.file)
+    def create_table_files(self, table_name: str, description: dict):
+        """
+        Run files generation for a single table
+        :param table_name: name of the table
+        :param description: fields of the table with value, type and db params
+        """
+        fields = description["fields"]
+        key_identifier = description["key_identifier"]["name"]
+        key_type = description["key_identifier"]["type"].pydantic_type_name
 
-    launcher_generator.run(list(tables_content.keys()), "0.0.0.0", 8080, os.getenv("OUTPUT_PATH"))
+        if schema_generator.run(table_name, fields, self.output_path) is False:
+            raise SchemaGenerationException(f"Fail to generate schema for {table_name} table")
 
-    # Generate crud foreach table describe in input file
-    [generate(table, fields, full_output_path) for table, fields in tables_content.items()]
+        if model_generator.run(table_name, fields, self.output_path) is False:
+            raise ModelGenerationException(f"Fail to generate model for {table_name} table")
 
-    logger.info(f"Generation finished, folder has been created at location {user_arguments.output_dir}")
+        if router_generator.run(table_name, self.output_path, key_identifier, key_type) is False:
+            raise RouterGenerationException(f"Fail to generate router for {table_name} table")
 
+        if controller_generator.run(table_name, key_identifier, key_type, fields, self.output_path) is False:
+            raise ControllerGenerationException(f"Fail to generate controller for {table_name} table")
 
-def generate(table_name: str, description: dict, output_path: str):
-    """
-    Run files generation for a single table
-    :param table_name: name of the table
-    :param description: fields of the table with value, type and db params
-    """
-    fields = description["fields"]
-    key_identifier = description["key_identifier"]["name"]
-    key_type = description["key_identifier"]["type"].pydantic_type_name
+    @staticmethod
+    def start_api(output_path: str):
+        print(output_path)
+        try:
+            logger.info("Running api... swagger documentation is available at http://0.0.0.0:8080/docs")
+            os.system(f"python {output_path}/app.py")
+        except OSError:
+            logger.error("Fail to start generated api, verify that output path is absolute path")
+            pass
 
-    if schema_generator.run(table_name, fields, output_path) is False:
-        raise SchemaGenerationException(f"Fail to generate schema for {table_name} table")
+    def run(self):
+        user_args = self.user_args
+        tables_content = extract_table_structure(user_args.file)
 
-    if model_generator.run(table_name, fields, output_path) is False:
-        raise ModelGenerationException(f"Fail to generate model for {table_name} table")
+        # Generate api structure and base files
+        self.create_common_files(tables_content)
 
-    if router_generator.run(table_name, output_path, key_identifier, key_type) is False:
-        raise RouterGenerationException(f"Fail to generate router for {table_name} table")
+        # Generate crud foreach table describe in input file
+        [self.create_table_files(table, fields) for table, fields in tables_content.items()]
 
-    if controller_generator.run(table_name, key_identifier, key_type, fields, output_path) is False:
-        raise ControllerGenerationException(f"Fail to generate controller for {table_name} table")
+        logger.info(f"Generation finished, folder has been created at location {user_args.output_dir}")
+
+        # Start api
+        if user_args.start.lower() == "true":
+            self.start_api(self.output_path)
+        else:
+            logger.warning(f"Parameter start is set to False, api will not start automatically after files generation")
 
 
 if __name__ == '__main__':
-    start()
+    logger.info("Start CrudGen {} ...".format(config[CONFIG_ENV].VERSION))
+    user_args = set_parameters()
+    crudgen = Crudgen(user_args)
+    crudgen.run()

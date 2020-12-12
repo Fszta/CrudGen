@@ -19,7 +19,7 @@ def run(table_name: str, output_path: str, key_name: str, key_type: str):
     :param output_path: path of the output directory
     :param key_name: name of the key use to identify sample
     :param key_type: type of the key
-    :return: boolean, generated filename
+    :return: generated filename
     """
 
     filename = f"{table_name}_router.py"
