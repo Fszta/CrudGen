@@ -124,10 +124,10 @@ def generate_update_function(table_name: str, identifier: str):
     """
     model_class = table_name + "_model." + table_name.capitalize()
 
-    function_definition = f"def update_{table_name}(db: Session, {identifier}, new_value):\n"
+    function_definition = f"def update_{table_name}(db: Session, {identifier}, field_name, new_value):\n"
     content = Indentator.IND_LEVEL_1 + f"db_{table_name} = db.query({model_class}).filter({model_class}." \
                                        f"{identifier} == {identifier}).first()" + "\n" + \
-              Indentator.IND_LEVEL_1 + f"db_{table_name} = new_value" + "\n" + \
+              Indentator.IND_LEVEL_1 + f"setattr(db_{table_name}, field_name, new_value)" + "\n" + \
               Indentator.IND_LEVEL_1 + f"db.commit()" + "\n" + \
               Indentator.IND_LEVEL_1 + f"db.refresh(db_{table_name})" + "\n" + \
               Indentator.IND_LEVEL_1 + f"return db_{table_name}"

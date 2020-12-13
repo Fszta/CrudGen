@@ -33,9 +33,9 @@ def create_generated(db: Session, generated: generated_schema.Generated):
     return db_generated
 
 
-def update_generated(db: Session, id, new_value):
+def update_generated(db: Session, id, field_name, new_value):
     db_generated = db.query(generated_model.Generated).filter(generated_model.Generated.id == id).first()
-    db_generated = new_value
+    setattr(db_generated, field_name, new_value)
     db.commit()
     db.refresh(db_generated)
     return db_generated
