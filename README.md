@@ -45,7 +45,7 @@ Developed under Python 3.8.2
 
 ```bash
 python -m crudgen.app \ 
-    --file crudgen/example/example.json \
+    --file example/example.json \
     --output /Users/fsz/Development/ \
     --start True
 ```
