@@ -49,10 +49,10 @@ class TestControllerGenerator(TestCase):
         self.assertEqual(expected, generated)
 
     def test_generate_update_function(self):
-        expected = "\n\ndef update_generated(db: Session, id, new_value):" + "\n" + \
+        expected = "\n\ndef update_generated(db: Session, id, field_name, new_value):" + "\n" + \
                    "    db_generated = db.query(generated_model.Generated).filter(generated_model.Generated.id == id)" \
                    ".first()" + "\n" + \
-                   "    db_generated = new_value" + "\n" + \
+                   "    setattr(db_generated, field_name, new_value)" + "\n" + \
                    "    db.commit()" + "\n" + \
                    "    db.refresh(db_generated)" + "\n" + \
                    "    return db_generated\n"
