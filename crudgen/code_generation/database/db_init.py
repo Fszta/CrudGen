@@ -6,13 +6,15 @@ from sqlalchemy.orm import sessionmaker
 
 if os.getenv("DB_URL") is None:
     SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={"check_same_thread": False}
+    )
 else:
     SQLALCHEMY_DATABASE_URL = os.environ["DB_URL"]
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
-# Create SQLALchemy engine
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
