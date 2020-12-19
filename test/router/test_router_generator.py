@@ -71,9 +71,14 @@ class TestRouterGenerator(TestCase):
     def test_generate_delete_one(self):
         expected = "\n\n" + '@router.delete("/generated/{id}", tags=["generated"])' + "\n" + \
                    "async def delete_generated(id: int, db: Session = Depends(get_db)):" + "\n" + \
-                   "    generated_controller.delete_generated(db, id)" + "\n"
+                   "    is_deleted = generated_controller.delete_generated(db, id)" + "\n" + \
+                   "    if is_deleted is None:" + "\n" + \
+                   "        raise HTTPException(status_code=404, detail=f'Sample {id} does not exist in database')" + "\n" + \
+                   "    else:" + "\n" + \
+                   "        return {'message': f'Successfully delete sample {id}'}" + "\n"
 
         generated = generate_delete_one("generated", "id", "int")
+        self.maxDiff = None
         self.assertEqual(expected, generated)
 
     def test_run(self):
