@@ -43,4 +43,8 @@ async def update_generated(id: int, field_name: str, field_value: str, db: Sessi
 
 @router.delete("/generated/{id}", tags=["generated"])
 async def delete_generated(id: int, db: Session = Depends(get_db)):
-    generated_controller.delete_generated(db, id)
+    is_deleted = generated_controller.delete_generated(db, id)
+    if is_deleted is None:
+        raise HTTPException(status_code=404, detail=f'Sample {id} does not exist in database')
+    else:
+        return {'message': f'Successfully delete sample {id}'}

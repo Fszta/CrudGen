@@ -83,7 +83,11 @@ def generate_router_decorator(table_name: str, http_method: str, key: str, singl
 
 @function_declaration
 def generate_add_one(table_name: str):
-    """ Generate create route """
+    """
+    Generate create sample function
+    :param table_name: name of the table
+    :return: string containing create function
+    """
     decorator = generate_router_decorator(table_name, "post", None, True) + "\n"
     function_definition = "async def create_" + table_name + "(" + table_name + ": " + \
                           table_name + "_schema" + "." + table_name.capitalize() + ", db: Session = " \
@@ -99,6 +103,13 @@ def generate_add_one(table_name: str):
 
 @function_declaration
 def generate_get_one(table_name: str, key: str, key_type: str):
+    """
+    Generate get one sample function
+    :param table_name: name of the table
+    :param key: attribute used to identify sample
+    :param key_type: type of the key
+    :return: string containing get one function
+    """
     decorator = generate_router_decorator(table_name, "get", key, True) + "\n"
     function_definition = "async def get_{}({}: {}, db: Session = Depends(get_db)):".format(
         table_name,
@@ -116,6 +127,11 @@ def generate_get_one(table_name: str, key: str, key_type: str):
 
 @function_declaration
 def generate_get_all(table_name: str):
+    """
+    Generate get all samples function
+    :param table_name: name of the table
+    :return: string containing get all function
+    """
     decorator = generate_router_decorator(table_name, "get", None, False) + "\n"
 
     function_definition = f"async def get_all_{table_name}(db: Session = Depends(get_db)):"
@@ -132,6 +148,13 @@ def generate_get_all(table_name: str):
 
 @function_declaration
 def generate_update_one(table_name: str, key: str, key_type: str):
+    """
+    Generate update sample function
+    :param table_name: name of the table
+    :param key: attribute used to identify sample
+    :param key_type: type of the key
+    :return: string containing update one function
+    """
     decorator = generate_router_decorator(table_name, "put", key, None) + "\n"
     function_definition = f"async def update_{table_name}({key}: {key_type}, field_name: str, field_value: str," \
                           " db: Session = Depends(get_db)):"
@@ -151,10 +174,21 @@ def generate_update_one(table_name: str, key: str, key_type: str):
 
 @function_declaration
 def generate_delete_one(table_name: str, key: str, key_type: str):
+    """
+    Generate delete single sample function
+    :param table_name: name of the table
+    :param key: attribute used to identify sample
+    :param key_type: type of the key
+    :return: string containing delete function
+    """
     decorator = generate_router_decorator(table_name, "delete", key, None) + "\n"
     function_definition = f"async def delete_{table_name}({key}: {key_type}, db: Session = Depends(get_db)):"
-    content = Indentator.IND_LEVEL_1 + f"{table_name}_controller.delete_{table_name}(db, {key})"
-
+    content = Indentator.IND_LEVEL_1 + f"is_deleted = {table_name}_controller.delete_{table_name}(db, {key})" + "\n" + \
+              Indentator.IND_LEVEL_1 + "if is_deleted is None:" + "\n" + \
+              Indentator.IND_LEVEL_2 + "raise HTTPException(status_code=404, " \
+                                       "detail=f'Sample {"+key+"} does not exist in database')" + "\n" + \
+              Indentator.IND_LEVEL_1 + "else:" + "\n" + \
+              Indentator.IND_LEVEL_2 + "return {'message': f'Successfully delete sample {" + f"{key}" + "}'}"
     delete_one_method = decorator + function_definition + "\n" + content
 
     return delete_one_method
