@@ -28,6 +28,12 @@ def set_parameters():
 
     os.environ["OUTPUT_PATH"] = user_arguments.output_dir + user_arguments.name
 
+    if args["db_url"] is not None:
+        logger.info(f"Set default database to {args['db_url']}")
+        os.environ["DB_URL"] = args["db_url"]
+    else:
+        logger.warn("No db url pass as argument, will check if DB_URL environment variable exists, "
+                    "otherwise will use SQL Lite as default db")
     return user_arguments
 
 
@@ -44,7 +50,7 @@ def parse_arguments():
     ap.add_argument("-s", "--start", required=True, help="boolean - true to run api - false to only generate files")
     ap.add_argument("-n", "--name", required=False, help="name of the generated directory", nargs="?",
                     const=config[CONFIG_ENV].GENERATED_API_PATH)
-
+    ap.add_argument("-d", "--db_url", required=False, help="db url as driver://user:password@host:port/dbName")
     args = vars(ap.parse_args())
 
     return args
