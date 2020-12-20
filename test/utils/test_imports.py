@@ -86,3 +86,9 @@ class TestImports(TestCase):
         expected = "from datetime import datetime\n"
         generated = datetime_import()
         self.assertEqual(expected, generated)
+
+    def test_cors_import(self):
+        """ Test CORS starlette import """
+        expected = "from starlette.middleware.cors import CORSMiddleware\n"
+        generated = cors_import()
+        self.assertEqual(expected, generated)

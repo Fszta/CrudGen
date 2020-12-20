@@ -9,15 +9,30 @@ class TestLauncherGenerator(TestCase):
             ["table_1", "table_2"],
             None,
             None,
-            ""
+            "",
+            True
         )
         check_files_are_identical("app.py", "test/launcher/expected_launcher.py")
 
-    def test_fast_content_setup(self):
+    def test_fast_content_setup_base(self):
         """ Test fastapi init statements generation """
         expected = "Base.metadata.create_all(bind=engine)\n" + \
                    "app = FastAPI()\n"
-        generated = launcher_generator.fast_setup_content()
+        generated = launcher_generator.fast_setup_content(False)
+        self.assertEqual(expected, generated)
+
+    def test_fast_content_setup_with_cors(self):
+        """ Test fastapi init statements generation with cors activation """
+        expected = "Base.metadata.create_all(bind=engine)\n" + \
+                   "app = FastAPI()\n\n" + \
+                   "app.add_middleware(" + "\n" + \
+                   "    CORSMiddleware," + "\n" + \
+                   "    allow_origins=['*']," + "\n" + \
+                   "    allow_credentials=True," + "\n" + \
+                   "    allow_methods=['*']," + "\n" + \
+                   "    allow_headers=['*']" + "\n" + ")\n"
+
+        generated = launcher_generator.fast_setup_content(True)
         self.assertEqual(expected, generated)
 
     def test_include_routes(self):

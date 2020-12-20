@@ -19,7 +19,7 @@ class Crudgen:
         self.user_args = user_args
         self.output_path = user_args.output_dir + user_args.name + "/"
 
-    def create_common_files(self, tables_content):
+    def create_common_files(self, tables_content, cors_activation: bool):
         """
         Generate needed common files and directory whatever
         the number of tables. Following files / dir are created :
@@ -30,7 +30,7 @@ class Crudgen:
 
         create_api_structure(self.output_path)
         generate_db_init_file(self.output_path)
-        launcher_generator.run(list(tables_content.keys()), "0.0.0.0", 8080, self.output_path)
+        launcher_generator.run(list(tables_content.keys()), "0.0.0.0", 8080, self.output_path, cors_activation)
 
     def create_table_files(self, table_name: str, description: dict):
         """
@@ -66,10 +66,11 @@ class Crudgen:
 
     def run(self):
         user_args = self.user_args
+
         tables_content = extract_table_structure(user_args.file)
 
         # Generate api structure and base files
-        self.create_common_files(tables_content)
+        self.create_common_files(tables_content, user_args.cors_activation)
 
         # Generate crud foreach table describe in input file
         [self.create_table_files(table, fields) for table, fields in tables_content.items()]

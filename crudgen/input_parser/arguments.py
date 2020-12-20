@@ -11,6 +11,7 @@ class UserArgs:
     output_dir: str
     start: bool
     name: str
+    cors_activation: bool
 
 
 def set_parameters():
@@ -20,7 +21,8 @@ def set_parameters():
         args["file"],
         process_output_dir_path(args["output_dir"]),
         args["start"],
-        args["name"]
+        args["name"],
+        args["cors_activation"]
     )
     if user_arguments.name is None:
         logger.warn(f"--name parameter is unset, set default to {config[CONFIG_ENV].GENERATED_API_PATH}")
@@ -51,6 +53,8 @@ def parse_arguments():
     ap.add_argument("-n", "--name", required=False, help="name of the generated directory", nargs="?",
                     const=config[CONFIG_ENV].GENERATED_API_PATH)
     ap.add_argument("-d", "--db_url", required=False, help="db url as driver://user:password@host:port/dbName")
+    ap.add_argument("-c", "--cors_activation", required=False, help="boolean - true to activate cors", nargs="?",
+                    const=False)
     args = vars(ap.parse_args())
 
     return args
