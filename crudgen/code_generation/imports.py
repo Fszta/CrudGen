@@ -103,3 +103,8 @@ def fastapi_core_import():
 @generic_import_declaration
 def datetime_import():
     return "from datetime import datetime"
+
+
+@generic_import_declaration
+def cors_import():
+    return "from starlette.middleware.cors import CORSMiddleware"
