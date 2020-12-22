@@ -1,5 +1,5 @@
 
-<p align="center"><img src="assets/cover.png" height=175/></p>
+<p align="center"><img src="https://github.com/Fszta/CrudGen/blob/master/assets/cover.png" height=175/></p>
 
 [![codecov](https://codecov.io/gh/Fszta/CrudGen/branch/development/graph/badge.svg?token=SGSIK5GG1C)](https://codecov.io/gh/Fszta/CrudGen)
 ![version](https://img.shields.io/badge/version-v0.1--alpha-brightgreen)
@@ -128,7 +128,7 @@ According to example.json, a crud for two tables will be generated : user and ci
 With the previous command, the api will start automatically, swagger docs will be accessible at http://0.0.0.0:8080/docs 
 You will find the following page which allows you to try out every endpoints:
 <p align="center">
-  <img src="example/open-api.png" title="swagger-ui">
+  <img src="https://github.com/Fszta/CrudGen/blob/master/example/open-api.png" title="swagger-ui">
 </p>
 
 
