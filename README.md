@@ -6,7 +6,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 # CrudGen - FastApi crud generator
 CrudGen is a CLI tool that allows you to generate & run a CRUD for <a href="https://fastapi.tiangolo.com">FastApi</a> framework.
-CrudGen goal is to make simple and fast the process of building SQL Tables and associated crud, only giving a json file describing SQL table attributes as input.
+CrudGen goal is to make simple and fast the process of building SQL Tables and the associated crud, with only providing a json file describing SQL table attributes as input.
 
 ## Features
 * SqlAlchemy model generation
@@ -52,9 +52,9 @@ python -m crudgen.app \
 
 ### Parameters : 
 #### Required
-* --file: path of the json file describing table
+* --file: path of the json file describing the tables
 * --output: absolute path of the generated api output directory
-* --start: boolean, if true api will start after generation 
+* --start: boolean, if set to true, the api will start after generation 
 
 #### Optional
 * --name: name of the generated api 
@@ -124,18 +124,18 @@ Input file content : example.json
    }
 }
 ```
-According to example.json, crud for two tables will be generated : user and city. 
-With the previous command, api will start automatically, swagger docs will be accessible at http://0.0.0.0:8080/docs 
-You'll find the following page which allows you to try out every endpoints:
+According to example.json, a crud for two tables will be generated : user and city. 
+With the previous command, the api will start automatically, swagger docs will be accessible at http://0.0.0.0:8080/docs 
+You will find the following page which allows you to try out every endpoints:
 <p align="center">
   <img src="example/open-api.png" title="swagger-ui">
 </p>
 
 
 ### Fields description
-* First field: table's name (user & city in example.json)
-* key_identifier: name of the sql attribute use to identify sample and request database
-* fields: list of field discribing sql table attributes 
+* First field: table name (user & city in example.json)
+* key_identifier: name of the sql attributes used to identify the sample and request database
+* fields: list of the fields discribing sql table attributes 
 
 In v0.1-alpha, following types options are supported:
 * integer
@@ -150,5 +150,5 @@ An attribute can be use as primary key and / or set as unique
 * Relation between table fields 
 * CORS support
 * Add more supported types 
-* Ability to generate route for file upload
+* Ability to generate routes for file uploads
 * Fix update endpoint bug
