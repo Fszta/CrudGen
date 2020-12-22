@@ -56,7 +56,10 @@ class Crudgen:
 
     @staticmethod
     def start_api(output_path: str):
-        print(output_path)
+        """
+        Launch generated api
+        :param output_path: path of the generated api
+        """
         try:
             logger.info("Running api... swagger documentation is available at http://0.0.0.0:8080/docs")
             os.system(f"python {output_path}/app.py")
@@ -65,6 +68,8 @@ class Crudgen:
             pass
 
     def run(self):
+        logger.info("Start CrudGen {} ...".format(config[CONFIG_ENV].VERSION))
+
         user_args = self.user_args
 
         tables_content = extract_table_structure(user_args.file)
@@ -85,7 +90,4 @@ class Crudgen:
 
 
 if __name__ == '__main__':
-    logger.info("Start CrudGen {} ...".format(config[CONFIG_ENV].VERSION))
-    user_args = set_parameters()
-    crudgen = Crudgen(user_args)
-    crudgen.run()
+    Crudgen(set_parameters()).run()
